@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Title</title>
+    <link rel="stylesheet" href="../element-ui/lib/theme-chalk/index.css">
+    <script src="../js/vue.js"></script>
+    <style scoped lang="scss">
+
+        .index {
+            height: calc(100vh);
+        }
+
+        html, body, #app, .el-container {
+
+            /*统一设置高度为100%*/
+            height: 100%;
+        }
+
+        .el-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .el-row .el-card {
+            min-width: 100%;
+            height: 100%;
+            margin-right: 20px;
+            transition: all .5s;
+        }
+
+        .el-form-item {
+            margin-bottom: 0 !important;
+        }
+
+        .box-card {
+            .header {
+                position: relative;
+
+                .label {
+                    padding: 0 3px;
+                    background-color: #fdf0da;
+                    color: #f19901;
+                }
+            }
+        }
+    </style>
+    <script src="../element-ui/lib/index.js"></script>
+
+    <style>
+        body {
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+        .card {
+            /*min-width: 250px;*/
+            /*max-width: 650px;*/
+            height: 160px;
+            margin: 10px 40px 15px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <el-row type="flex" justify="start" >
+<!--        <el-col v-for="item in cards" :key="item.id" :xs="10" :sm="7"  :md="7"  :lg="5" :xl="4" class="card">-->
+        <el-col v-for="item in cards" :key="item.id" :xs="10" :sm="9"  :md="7"  :lg="7" :xl="5" class="card">
+            <el-card :index="item.id" class="box-card" style="">
+                <div class="header">
+                    <span>{{item.name}}</span>
+                    <el-button style="background-color:#b3b4b5;float: right; padding: 3px 0" type="text">
+                        <i class="el-icon-more" style="color: white;width: 25px"></i>
+                    </el-button>
+                </div>
+
+                <div style="margin-top: 20px">
+                    卡片:
+                    <span style="font-size: medium">{{item.total}}</span>
+                </div>
+                <el-divider></el-divider>
+                <div class="footer" >
+                    <div style="font-size: small">
+                        <i class="el-icon-time"></i>
+                        <span style="margin-right: 15px;color: #8c939d">未学习{{item.unlearned}}</span>
+                        <span style="color: red">需复习{{item.review}}</span>
+                    </div>
+                </div>
+            </el-card>
+        </el-col>
+    </el-row>
+
+
+</div>
+</body>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            cards: [{
+                id: 1,
+                name: "微机原理",
+                total: 10,
+                learned: 5,
+                unlearned: 5,
+                review: 5
+            }, {
+                id: 2,
+                name: "C语言",
+                total: 51,
+                learned: 5,
+                unlearned: 25,
+                review: 5
+            }, {
+                id: 3,
+                name: "高等数学",
+                total: 6,
+                learned: 5,
+                unlearned: 5,
+                review: 5
+            }, {
+                id: 4,
+                name: "英语",
+                total: 16,
+                learned: 5,
+                unlearned: 5,
+                review: 5
+            },
+            ],
+        }
+    })
+</script>
+</html>

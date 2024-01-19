@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>容器布局</title>
+    <link rel="stylesheet" href="../element-ui/lib/theme-chalk/index.css">
+    <script src="../js/vue.js"></script>
+    <script src="../element-ui/lib/index.js"></script>
+    <style scoped lang="scss">
+        .index {
+            height: calc(100vh);
+        }
+
+        html, body, #app, .el-container .el-main .el-aside {
+            /*统一设置高度为100%*/
+            height: 100%;
+            background-color: #f5f7fb;
+        }
+    </style>
+    <style>
+        .el-container {
+            height: 100%;
+        }
+
+        .el-header {
+            height: 100px;
+        }
+
+        #aside {
+            background-color: #f5f7fb;
+            color: #333;
+            height: 100%;
+            width: 100%;
+        }
+
+        #main {
+            height: 100%;
+            width: 100%;
+        }
+
+        table th,
+        table td {
+            border-bottom: none !important;
+        }
+
+        .el-table::before {
+            height: 0px;
+        }
+
+        .customer-table .el-table__fixed-right::before,
+        .el-table__fixed::before {
+            width: 0;
+        }
+
+        .el-table--enable-row-hover .el-table__body tr:hover > td {
+            /*background-color: #f6d604 !important;*/
+            cursor: pointer; /* 修改鼠标样式 */
+            color: #000000;
+            font-size: 15px;
+        }
+
+        #display {
+            margin-top: 20px;
+            background-color: white;
+            height: 120px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        #start {
+            border: 1px solid;
+            border-radius: 5px;
+            background-color: #7477ff;
+            color: white;
+        }
+
+        .catalogue  {
+            font-size: 16px;
+            height: 40px;
+            width: 96%;
+            line-height: 40px;
+            border: 1px white;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 15px;
+        }
+        .catalogue:hover{
+            background-color: #e9e9e9;
+        }
+
+        .card {
+            background-color: white;
+            height: 180px;
+            border: 1px white;
+            border-radius: 5px;
+            padding: 10px;
+            /*margin: 10px 10px 10px 0px;*/
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <el-header>
+            <i class="el-icon-arrow-left" style="font-size: x-large"></i>
+        </el-header>
+        <el-container>
+<!--            <el-col :xs="0" :sm="8" :md="7" :lg="6">-->
+            <el-col :xs="0" :sm="7" :md="5" :lg="6">
+                <div id="aside">
+                    <el-row :sm="24" :md="16" :lg="12" type="flex" justify="end">
+                        <div style="float: right;margin-top: 200px;margin-right: 10px">
+                            <el-row type="flex" justify="start"
+                                    style="padding: 5px;background-color: white;border: 1px solid white;border-radius: 5px;font-size: 16px">
+                                <i class="el-icon-tickets" style="margin: 3px 0 5px 0"></i>
+                                <span>目录</span>
+                                <i style="margin-left: 100px" class="el-icon-arrow-up"></i>
+                            </el-row>
+                            <el-table :show-header="false"
+                                      :data="cardGroup.catalogueList"
+                                      :row-style="rowStyle"
+                                      @row-click="changeCurrentRow"
+                                      style="width: 150%;margin-top: 5px">
+                                <el-table-column label="hh" prop="name">
+                                    <template slot-scope="props">
+                                        <i class="el-icon-tickets" style="margin: 3px 0 5px 0"></i>
+                                        <span>{{props.row.name}}</span>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </el-row>
+                </div>
+            </el-col>
+<!--            <el-col :sm="16" :md="17" :lg="18">-->
+            <el-col :sm="20" :md="19" :lg="18">
+                <div id="main">
+                    <el-row>
+                        <span style="font-size: xx-large">{{cardGroup.name}}</span>
+                    </el-row>
+                    <el-row>
+                        <el-col :lg="16" :md="20" :sm="24" :xs="24">
+                            <div id="display">
+                                <el-row style=" display: flex;justify-content: center;align-items: center;height: 50%">
+                                    <span>全部&nbsp<span
+                                            style="color: #5fb1f3;font-size: large">{{cardGroup.total}}</span>&nbsp&nbsp&nbsp</span>
+                                    <span>未学习&nbsp<span
+                                            style="color: #5daf34;;font-size: large">{{cardGroup.unlearned}}</span>&nbsp&nbsp&nbsp</span>
+                                    <span>需复习&nbsp<span
+                                            style="color: #cf9236;font-size: large">{{cardGroup.review}}</span></span>
+                                </el-row>
+                                <el-row style="text-align: center">
+                                    <el-button id="start">开始学习</el-button>
+                                </el-row>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col  :lg="16" :md="20" :sm="24" :xs="24" >
+                            <template  v-for="item in cardGroup.catalogueList" :key="item.id">
+                                <el-row :index="item.id" :span="22">
+                                    <div class="catalogue">
+                                        <b>{{item.name}}</b>
+                                    </div>
+                                    <el-row type="flex" justify="start" :gutter="20">
+                                        <template v-for="card in item.cardList" :key="card.id">
+                                            <el-col :index="card.id" :span="8" >
+                                                <div class="card">
+                                                    <span>{{card.content}}</span>
+                                                </div>
+                                            </el-col>
+                                        </template>
+                                    </el-row>
+                                </el-row>
+                            </template>
+                        </el-col>
+                    </el-row>
+                </div>
+            </el-col>
+
+        </el-container>
+    </el-container>
+</div>
+</body>
+<script>
+
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                currentRowId: 1,
+                cardGroup: {
+                    id: 1,
+                    name: "微机原理",
+                    total: 10,
+                    learned: 5,
+                    unlearned: 5,
+                    review: 5,
+                    catalogueList: [{
+                        id: 1,
+                        name: "目录1",
+                        cartTotal: 3,
+                        cardList: [{
+                            id: 1,
+                            type: 1,
+                            headline: "测试1",
+                            content: "测试内容"
+                        }, {
+                            id: 2,
+                            type: 1,
+                            headline: "测试2",
+                            content: "测试内容"
+                        }, {
+                            id: 3,
+                            type: 1,
+                            headline: "测试3",
+                            content: "测试内容"
+                        }]
+                    }, {
+                        id: 2,
+                        name: "目录2",
+                        cartTotal: 2,
+                        cardList: [{
+                            id: 1,
+                            type: 1,
+                            headline: "测试1",
+                            content: "测试内容"
+                        }, {
+                            id: 2,
+                            type: 1,
+                            headline: "测试2",
+                            content: "测试内容"
+                        }]
+                    }],
+
+                },
+            }
+        },
+        methods: {
+            rowStyle({row, rowIndex}) {
+                if (this.currentRowId === row.id) {
+                    // 此处返回选中行的样式对象，按需设置
+                    return {
+                        'background-color': '#f5f7fb',
+                        'font-size': '15px',
+                        'color': '#000000',
+                        'height': '20px'
+                    }
+                } else {
+                    return {
+                        'background-color': '#f5f7fb',
+                        'font-size': '14px',
+                        'color': '#606266',
+                        'height': '20px'
+                    }
+                }
+            },
+            changeCurrentRow(row, column, event) {
+                if (this.currentRowId === row.id) return
+                this.currentRowId = row.id
+                // do something
+            }
+
+
+        }
+
+
+    });
+</script>
+</html>
