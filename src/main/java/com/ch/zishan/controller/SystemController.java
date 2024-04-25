@@ -29,7 +29,7 @@ public class SystemController {
             return Result.error("数据输入不合法");
         }
         user = userService.login(user);
-        BaseContext.set(Long.valueOf(user.getId()));
+        BaseContext.set(user.getId());
         return Result.success(user);
     }
 

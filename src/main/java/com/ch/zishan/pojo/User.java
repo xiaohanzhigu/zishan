@@ -1,22 +1,24 @@
 package com.ch.zishan.pojo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
 @TableName("tb_user")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    @TableId(type= IdType.AUTO)
+    private Long id;
+
     private String nickname;
     private String username;
     private String password;

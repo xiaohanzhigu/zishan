@@ -1,8 +1,6 @@
 package com.ch.zishan.pojo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +15,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
-    private Integer id;
-    private Chapter chapter;
+    @TableId(type= IdType.AUTO)
+    private Long id;
+    private Long chapter;
     private String content;
     private String headline;
     private Integer type;
@@ -35,15 +34,5 @@ public class Card {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public void setChapter(Integer chapterId) {
-        this.chapter = new Chapter();
-        this.chapter.setId(chapterId);
-    }
 }
 

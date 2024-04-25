@@ -16,6 +16,8 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     #日志输出
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #返回主键
+    use-generated-keys: true
   global-config:
     db-config:
       id-type: ASSIGN_ID

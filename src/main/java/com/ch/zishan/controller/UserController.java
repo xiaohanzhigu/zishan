@@ -28,9 +28,9 @@ public class UserController {
     public Result<User> getUser(HttpServletRequest request) {
         String token = request.getHeader("token");
         log.info("查询用户"+token);
-        Integer userId;
+        long userId;
         try {
-            userId = Integer.valueOf(JWT.decode(token).getAudience().get(0));
+            userId = Long.parseLong(JWT.decode(token).getAudience().get(0));
         }  catch (JWTDecodeException e) {
             throw new ServiceException("401","请登录");
         }

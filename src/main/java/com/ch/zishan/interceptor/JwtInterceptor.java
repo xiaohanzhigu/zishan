@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.ch.zishan.common.BaseContext;
 import com.ch.zishan.exception.ServiceException;
 import com.ch.zishan.mapper.UserMapper;
 import com.ch.zishan.pojo.User;
@@ -32,7 +33,6 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         String token = request.getHeader("Token");
-        log.info("asdjfsadfas"+token);
         if (StringUtils.isBlank(token)) {
             token = request.getParameter("token");
         }
@@ -67,6 +67,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new ServiceException("401", "请登录");
         }
         log.info("允许访问"+user.getUsername());
+        BaseContext.set(user.getId());
         return true;
     }
 }

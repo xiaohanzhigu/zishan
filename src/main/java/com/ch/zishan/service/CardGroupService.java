@@ -5,4 +5,6 @@ import com.ch.zishan.pojo.CardGroup;
 
 public interface CardGroupService extends IService<CardGroup> {
 
+    public Integer addCardGroup(CardGroup cardGroup);
+
 }
