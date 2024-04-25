@@ -23,6 +23,7 @@ public class Card {
     private String headline;
     private Integer type;
     private Integer isDeleted;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -27,6 +28,44 @@ public class CardGroupController {
     private CardService cardService;
     @Resource
     private ChapterService chapterService;
+
+    @PostMapping("/addCardGroup")
+    public Result<Integer> addCardGroup() {
+        CardGroup cardGroup = new CardGroup();
+        cardGroup.setName("无标题卡片集");
+        cardGroup.setIsDeleted(0);
+        cardGroup.setUser(1);
+        cardGroupService.save(cardGroup);
+        return Result.success(cardGroup.getId());
+    }
+
+    @GetMapping("/detail")
+    public Result<CardGroup> detail(@RequestParam Integer id) {
+        QueryWrapper<CardGroup> groupWrapper = new QueryWrapper<>();
+        QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
+        QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
+
+        groupWrapper.eq("id",id);
+        CardGroup group = cardGroupService.getOne(groupWrapper);
+        chapterWrapper.eq("card_group",group.getId());
+        List<Chapter> chapters = chapterService.list(chapterWrapper);
+        List<Chapter> chapterList = new ArrayList<>();
+        for (Chapter chapter : chapters) {
+            //查询章节信息
+            chapterWrapper.clear();
+            chapterWrapper.eq("id",chapter.getId());
+            Chapter one = chapterService.getOne(chapterWrapper);
+
+            //查询章节中的卡片
+            cardWrapper.clear();
+            cardWrapper.eq("chapter",chapter.getId());
+            List<Card> cards = cardService.list(cardWrapper);
+            one.setCardList(cards);
+            chapterList.add(one);
+        }
+        group.setChapterList(chapterList);
+        return Result.success(group);
+    }
 
     @GetMapping("/allCardGroup")
     public Result<List<CardGroup>> allCardGroup(HttpServletRequest request, @RequestParam String type) {
