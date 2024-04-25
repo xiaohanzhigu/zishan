@@ -1,6 +1,7 @@
 package com.ch.zishan.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.ch.zishan.common.BaseContext;
 import com.ch.zishan.common.Result;
 import com.ch.zishan.interceptor.AuthAccess;
 import com.ch.zishan.pojo.User;
@@ -28,6 +29,7 @@ public class SystemController {
             return Result.error("数据输入不合法");
         }
         user = userService.login(user);
+        BaseContext.set(Long.valueOf(user.getId()));
         return Result.success(user);
     }
 

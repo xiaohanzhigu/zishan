@@ -2,19 +2,35 @@ package com.ch.zishan.pojo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@TableName("tb_card_group")
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CardGroup {
     private Integer id;
     private String name;
-    private User User;
+    private User user;
     private Integer total;
     private Integer collection;
     private Integer isPublic;
-    private Integer isDelete;
+    private Integer isDeleted;
+
+    @TableField(exist = false)
+    private Integer cardTotal = 0;
+
+    @TableField(exist = false)
+    private List<Chapter> chapterList;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
@@ -27,12 +43,8 @@ public class CardGroup {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setChapterList(List<Chapter> chapterList) {
+        this.chapterList = chapterList;
     }
 
     public void setUser(Integer userId) {
@@ -40,35 +52,4 @@ public class CardGroup {
         user.setId(userId);
     }
 
-    public void setTotal(Integer total) {
-        this.total = total;
-    }
-
-    public void setCollection(Integer collection) {
-        this.collection = collection;
-    }
-
-    public void setIsPublic(Integer isPublic) {
-        this.isPublic = isPublic;
-    }
-
-    public void setIsDelete(Integer isDelete) {
-        this.isDelete = isDelete;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public void setCreateUser(Long createUser) {
-        this.createUser = createUser;
-    }
-
-    public void setUpdateUser(Long updateUser) {
-        this.updateUser = updateUser;
-    }
 }
