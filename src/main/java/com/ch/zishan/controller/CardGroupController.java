@@ -31,15 +31,30 @@ public class CardGroupController {
     @Resource
     private ChapterService chapterService;
 
+    @DeleteMapping
+    public Result<String> deleteCardGroup(@RequestParam Long id) {
+        log.info("删除卡片集，id：" + id);
+        QueryWrapper<CardGroup> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        CardGroup cardGroup = cardGroupService.getOne(wrapper);
+        if (!cardGroup.getCreateUser().equals(BaseContext.get())) {
+            return Result.error("401", "无权限删除");
+        }
+        cardGroupService.deleteCardGroup(id);
+        log.info("删除卡片集成功，id：" + id);
+        return Result.success("删除成功");
+    }
+
     @PutMapping
-    public Result<Boolean> updateCardGroup(@RequestBody CardGroup cardGroup) {
+    public Result<String> updateCardGroup(@RequestBody CardGroup cardGroup) {
+        log.info("更新卡片集，id：" + cardGroup.getId());
         UpdateWrapper<CardGroup> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", cardGroup.getId())
                         .set("name", cardGroup.getName());
 
         cardGroupService.update(wrapper);
         log.info("更新卡片集成功，id：" + cardGroup.getId());
-        return Result.success(true);
+        return Result.success("更新成功");
     }
 
     @PostMapping("/addCardGroup")
@@ -53,7 +68,7 @@ public class CardGroupController {
     }
 
     @GetMapping("/detail")
-    public Result<CardGroup> detail(@RequestParam Integer id) {
+    public Result<CardGroup> detail(@RequestParam Long id) {
         QueryWrapper<CardGroup> groupWrapper = new QueryWrapper<>();
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
         QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
@@ -101,9 +116,6 @@ public class CardGroupController {
             chapterWrapper.eq("card_group",group.getId());
             List<Chapter> chapterList =  chapterService.list(chapterWrapper);
             group.setChapterList(chapterList);
-//            for (Chapter chapter : chapterList) {
-//                group.setCardTotal(group.getCardTotal() + chapter.getTotal());
-//            }
         }
 
         return Result.success(list);

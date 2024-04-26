@@ -7,4 +7,6 @@ public interface CardGroupService extends IService<CardGroup> {
 
     public Integer addCardGroup(CardGroup cardGroup);
 
+    public boolean deleteCardGroup(Long id);
+
 }

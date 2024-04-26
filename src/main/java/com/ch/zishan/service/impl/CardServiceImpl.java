@@ -9,6 +9,7 @@ import com.ch.zishan.pojo.CardGroup;
 import com.ch.zishan.pojo.Chapter;
 import com.ch.zishan.service.CardService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -26,6 +27,7 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
 
 
     @Override
+    @Transactional
     public boolean addCard(Card card) {
         cardMapper.insert(card);
         if (card.getType() == 9) {
