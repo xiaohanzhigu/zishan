@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ch.zishan.mapper.CardGroupMapper;
 import com.ch.zishan.mapper.CardMapper;
 import com.ch.zishan.mapper.ChapterMapper;
+import com.ch.zishan.pojo.Card;
 import com.ch.zishan.pojo.CardGroup;
+import com.ch.zishan.pojo.Chapter;
 import com.ch.zishan.service.CardGroupService;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,18 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
 
     public Integer addCardGroup(CardGroup cardGroup) {
         int id = cardGroupMapper.insert(cardGroup);
+
+        Chapter chapter = new Chapter();
+        chapter.setName("无标题章节");
+        chapter.setCardGroup(cardGroup.getId());
+        chapterMapper.insert(chapter);
+
+        Card card = new Card();
+        card.setType(9);
+        card.setContent("占位卡片");
+        card.setHeadline("占位卡片");
+        card.setChapter(chapter.getId());
+        cardMapper.insert(card);
         return id;
     }
 

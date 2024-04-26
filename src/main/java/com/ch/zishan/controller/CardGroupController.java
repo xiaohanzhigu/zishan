@@ -68,36 +68,6 @@ public class CardGroupController {
         return Result.success(group);
     }
 
-//    @GetMapping("/allCardGroup")
-//    public Result<List<CardGroup>> allCardGroup(HttpServletRequest request, @RequestParam String type) {
-//        String token = request.getHeader("Token");
-//        Long id = Long.valueOf(JWT.decode(token).getAudience().get(0));
-//        log.info("查询卡片集用户：" + id);
-//        log.info("查询卡片集类型：" + type);
-//
-//        QueryWrapper<CardGroup> cardGroupWrapper = new QueryWrapper<>();
-//        QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
-//        QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
-//        if ("我的卡片集".equals(type)) {
-//            cardGroupWrapper.eq("user", id)
-//                    .eq("is_deleted", 0);
-//        }
-//
-//        List<CardGroup> list = cardGroupService.list(cardGroupWrapper);
-//
-//        for (CardGroup group : list) {
-//            chapterWrapper.eq("card_group",group.getId());
-//            List<Chapter> chapterList =  chapterService.list(chapterWrapper);
-//            group.setChapterList(chapterList);
-//
-//            for (Chapter chapter : chapterList) {
-//                group.setCardTotal(group.getCardTotal() + chapter.getTotal());
-//            }
-//        }
-//
-//            return Result.success(list);
-//    }
-
     @GetMapping("/allCardGroup")
     public Result<List<CardGroup>> allCardGroup(HttpServletRequest request, @RequestParam String type) {
         String token = request.getHeader("Token");
