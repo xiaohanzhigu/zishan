@@ -4,4 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ch.zishan.pojo.Chapter;
 
 public interface ChapterService extends IService<Chapter> {
+
+    public boolean addChapter(Chapter chapter);
 }

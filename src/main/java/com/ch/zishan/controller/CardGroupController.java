@@ -35,7 +35,7 @@ public class CardGroupController {
         CardGroup cardGroup = new CardGroup();
         cardGroup.setName("无标题卡片集");
         cardGroup.setUser(BaseContext.get());
-        Integer id = cardGroupService.addCardGroup(cardGroup);
+        cardGroupService.addCardGroup(cardGroup);
         log.info("添加卡片集成功，id：" + cardGroup.getId());
         return Result.success(cardGroup.getId());
     }
@@ -89,10 +89,9 @@ public class CardGroupController {
             chapterWrapper.eq("card_group",group.getId());
             List<Chapter> chapterList =  chapterService.list(chapterWrapper);
             group.setChapterList(chapterList);
-
-            for (Chapter chapter : chapterList) {
-                group.setCardTotal(group.getCardTotal() + chapter.getTotal());
-            }
+//            for (Chapter chapter : chapterList) {
+//                group.setCardTotal(group.getCardTotal() + chapter.getTotal());
+//            }
         }
 
         return Result.success(list);

@@ -19,8 +19,8 @@ public class Chapter {
     private Long id;
     private String name;
     private Long cardGroup;
-    private Integer total;
     private Integer isDeleted;
+    private Integer cardTotal;
 
     @TableField(exist = false)
     private List<Card> cardList;

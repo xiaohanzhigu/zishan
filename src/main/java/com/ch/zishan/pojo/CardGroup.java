@@ -19,12 +19,11 @@ public class CardGroup {
     private Long id;
     private String name;
     private Long user;
-    private Integer total;
     private Integer collection;
     private Integer isPublic;
     private Integer isDeleted;
-
-    @TableField(exist = false)
+//    private Integer total;
+    private Integer chapterTotal;
     private Integer cardTotal = 0;
 
     @TableField(exist = false)
