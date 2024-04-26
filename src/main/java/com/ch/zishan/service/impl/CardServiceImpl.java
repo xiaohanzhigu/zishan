@@ -44,4 +44,9 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
 
         return true;
     }
+
+    @Override
+    public Integer recoverCard(Long chapterId) {
+        return cardMapper.updateIsDeleted(chapterId);
+    }
 }

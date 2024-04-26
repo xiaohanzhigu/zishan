@@ -8,4 +8,6 @@ import org.springframework.stereotype.Service;
 public interface CardService extends IService<Card> {
 
     public boolean addCard(Card card);
+
+    public Integer recoverCard(Long chapterId);
 }

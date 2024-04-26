@@ -19,8 +19,9 @@ public class Chapter {
     private Long id;
     private String name;
     private Long cardGroup;
-    private Integer isDeleted;
     private Integer cardTotal;
+    @TableLogic
+    private Integer isDeleted;
 
     @TableField(exist = false)
     private List<Card> cardList;

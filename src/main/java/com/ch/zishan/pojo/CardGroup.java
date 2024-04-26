@@ -20,11 +20,11 @@ public class CardGroup {
     private String name;
     private Long user;
     private Integer collection;
-    private Integer isPublic;
-    private Integer isDeleted;
-//    private Integer total;
     private Integer chapterTotal = 0;
     private Integer cardTotal = 0;
+    private Integer isPublic;
+    @TableLogic
+    private Integer isDeleted;
 
     @TableField(exist = false)
     private List<Chapter> chapterList;

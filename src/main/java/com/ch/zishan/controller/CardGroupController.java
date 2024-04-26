@@ -31,6 +31,13 @@ public class CardGroupController {
     @Resource
     private ChapterService chapterService;
 
+    @PutMapping("/recover")
+    public Result<String> recoverCardGroup(@RequestBody CardGroup cardGroup) {
+        log.info("恢复卡片集，id：" + cardGroup);
+        cardGroupService.recoverCardGroup(cardGroup.getId());
+        return Result.success("恢复成功");
+    }
+
     @DeleteMapping
     public Result<String> deleteCardGroup(@RequestParam Long id) {
         log.info("删除卡片集，id：" + id);
@@ -105,14 +112,18 @@ public class CardGroupController {
         QueryWrapper<CardGroup> cardGroupWrapper = new QueryWrapper<>();
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
         QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
+        List<CardGroup> list = null;
         if ("我的卡片集".equals(type)) {
-            cardGroupWrapper.eq("user", id)
-                    .eq("is_deleted", 0);
+            cardGroupWrapper.eq("user", id);
+            list = cardGroupService.list(cardGroupWrapper);
+        } else if("回收站".equals(type)) {
+            list = cardGroupService.getDeleted(id);
         }
 
-        List<CardGroup> list = cardGroupService.list(cardGroupWrapper);
+
 
         for (CardGroup group : list) {
+            chapterWrapper.clear();
             chapterWrapper.eq("card_group",group.getId());
             List<Chapter> chapterList =  chapterService.list(chapterWrapper);
             group.setChapterList(chapterList);

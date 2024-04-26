@@ -18,12 +18,13 @@ public class User {
 
     @TableId(type= IdType.AUTO)
     private Long id;
-
     private String nickname;
     private String username;
     private String password;
     private Integer sex;
     private String phone;
+    // 1删除，0不删除
+    @TableLogic
     private Integer isDeleted;
     //创建时间
     @TableField(fill = FieldFill.INSERT)

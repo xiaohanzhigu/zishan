@@ -45,4 +45,9 @@ public class ChapterServiceImpl extends ServiceImpl<ChapterMapper, Chapter> impl
 
         return true;
     }
+
+    @Override
+    public Integer recoverChapter(Long id) {
+        return chapterMapper.updateIsDeleted(id);
+    }
 }

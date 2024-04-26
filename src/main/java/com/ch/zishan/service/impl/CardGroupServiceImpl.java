@@ -26,11 +26,26 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
     @Resource
     private ChapterService chapterService;
 
-//    @Resource
-//    private CardMapper cardMapper;
-//
-//    @Resource
-//    private ChapterMapper chapterMapper;
+    public List<CardGroup> getDeleted(Long userId) {
+        List<CardGroup> list = cardGroupMapper.getAllByUserIdDeletedXml(userId);
+        return list;
+    }
+
+    @Override
+    public Integer recoverCardGroup(Long id) {
+        QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
+
+        // 恢复卡片集
+        cardGroupMapper.updateIsDeleted(id);
+        // 恢复卡片集中的所有章节
+        chapterService.recoverChapter(id);
+        // 恢复每个章节中的卡片
+        chapterWrapper.eq("card_group",id);
+        chapterService.list(chapterWrapper).forEach(chapter -> {
+            cardService.recoverCard(chapter.getId());
+        });
+        return 1;
+    }
 
     public Integer addCardGroup(CardGroup cardGroup) {
         int id = cardGroupMapper.insert(cardGroup);

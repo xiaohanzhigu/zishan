@@ -21,6 +21,7 @@ public class Card {
     private String content;
     private String headline;
     private Integer type;
+    @TableLogic
     private Integer isDeleted;
 
     @TableField(fill = FieldFill.INSERT)
