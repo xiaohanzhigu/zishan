@@ -2,6 +2,7 @@ package com.ch.zishan.controller;
 
 import com.auth0.jwt.JWT;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ch.zishan.common.BaseContext;
 import com.ch.zishan.common.Result;
 import com.ch.zishan.pojo.Card;
@@ -29,6 +30,17 @@ public class CardGroupController {
     private CardService cardService;
     @Resource
     private ChapterService chapterService;
+
+    @PutMapping
+    public Result<Boolean> updateCardGroup(@RequestBody CardGroup cardGroup) {
+        UpdateWrapper<CardGroup> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", cardGroup.getId())
+                        .set("name", cardGroup.getName());
+
+        cardGroupService.update(wrapper);
+        log.info("更新卡片集成功，id：" + cardGroup.getId());
+        return Result.success(true);
+    }
 
     @PostMapping("/addCardGroup")
     public Result<Long> addCardGroup() {

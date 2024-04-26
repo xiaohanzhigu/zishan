@@ -2,7 +2,6 @@ package com.ch.zishan.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ch.zishan.mapper.CardGroupMapper;
-import com.ch.zishan.pojo.Card;
 import com.ch.zishan.pojo.CardGroup;
 import com.ch.zishan.pojo.Chapter;
 import com.ch.zishan.service.CardGroupService;
@@ -36,12 +35,7 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         chapter.setCardGroup(cardGroup.getId());
         chapterService.addChapter(chapter);
 
-        Card card = new Card();
-        card.setType(9);
-        card.setContent("占位卡片");
-        card.setHeadline("占位卡片");
-        card.setChapter(chapter.getId());
-        cardService.addCard(card);
+
         return id;
     }
 

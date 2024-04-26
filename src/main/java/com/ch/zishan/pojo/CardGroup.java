@@ -23,7 +23,7 @@ public class CardGroup {
     private Integer isPublic;
     private Integer isDeleted;
 //    private Integer total;
-    private Integer chapterTotal;
+    private Integer chapterTotal = 0;
     private Integer cardTotal = 0;
 
     @TableField(exist = false)

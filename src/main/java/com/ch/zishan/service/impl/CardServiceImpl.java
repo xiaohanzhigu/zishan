@@ -28,6 +28,9 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
     @Override
     public boolean addCard(Card card) {
         cardMapper.insert(card);
+        if (card.getType() == 9) {
+            return true;
+        }
         // 更新章节和卡片组的卡片数量
         Chapter chapter = chapterMapper.selectById(card.getChapter());
         chapter.setCardTotal(chapter.getCardTotal() + 1);
