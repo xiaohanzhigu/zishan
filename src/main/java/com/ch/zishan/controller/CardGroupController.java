@@ -11,6 +11,7 @@ import com.ch.zishan.pojo.Chapter;
 import com.ch.zishan.service.CardGroupService;
 import com.ch.zishan.service.CardService;
 import com.ch.zishan.service.ChapterService;
+import com.ch.zishan.utils.SysUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,16 @@ public class CardGroupController {
 
     @PutMapping("/recover")
     public Result<String> recoverCardGroup(@RequestBody CardGroup cardGroup) {
-        log.info("恢复卡片集，id：" + cardGroup);
+        log.info("恢复卡片集，id：" + cardGroup.getId());
+
+        // 只有创建卡片集者才可以恢复
+        QueryWrapper<CardGroup> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", cardGroup.getId()).eq("is_deleted", 1);
+        CardGroup group = cardGroupService.getOne(wrapper);
+        if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
+            return Result.error("401", "无权限恢复");
+        }
+
         cardGroupService.recoverCardGroup(cardGroup.getId());
         return Result.success("恢复成功");
     }
@@ -41,10 +51,11 @@ public class CardGroupController {
     @DeleteMapping
     public Result<String> deleteCardGroup(@RequestParam Long id) {
         log.info("删除卡片集，id：" + id);
+        // 只有创建卡片集者才可以删除
         QueryWrapper<CardGroup> wrapper = new QueryWrapper<>();
         wrapper.eq("id", id);
         CardGroup cardGroup = cardGroupService.getOne(wrapper);
-        if (!cardGroup.getCreateUser().equals(BaseContext.get())) {
+        if (!SysUtils.checkUser(BaseContext.get(),cardGroup.getCreateUser())) {
             return Result.error("401", "无权限删除");
         }
         cardGroupService.deleteCardGroup(id);
@@ -55,6 +66,15 @@ public class CardGroupController {
     @PutMapping
     public Result<String> updateCardGroup(@RequestBody CardGroup cardGroup) {
         log.info("更新卡片集，id：" + cardGroup.getId());
+
+        // 只有创建卡片集者才可以修改
+        QueryWrapper<CardGroup> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", cardGroup.getId());
+        CardGroup group = cardGroupService.getOne(queryWrapper);
+        if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
+            return Result.error("401", "无权限恢复");
+        }
+
         UpdateWrapper<CardGroup> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", cardGroup.getId())
                         .set("name", cardGroup.getName());
@@ -66,6 +86,7 @@ public class CardGroupController {
 
     @PostMapping("/addCardGroup")
     public Result<Long> addCardGroup() {
+        log.info("添加卡片集");
         CardGroup cardGroup = new CardGroup();
         cardGroup.setName("无标题卡片集");
         cardGroup.setUser(BaseContext.get());
@@ -112,15 +133,15 @@ public class CardGroupController {
         QueryWrapper<CardGroup> cardGroupWrapper = new QueryWrapper<>();
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
         QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
-        List<CardGroup> list = null;
         if ("我的卡片集".equals(type)) {
-            cardGroupWrapper.eq("user", id);
-            list = cardGroupService.list(cardGroupWrapper);
+            cardGroupWrapper.eq("user", id)
+                    .eq("is_deleted", 0);
         } else if("回收站".equals(type)) {
-            list = cardGroupService.getDeleted(id);
+            cardGroupWrapper.eq("user", id)
+                    .eq("is_deleted", 1);
         }
 
-
+        List<CardGroup> list = cardGroupService.list(cardGroupWrapper);
 
         for (CardGroup group : list) {
             chapterWrapper.clear();

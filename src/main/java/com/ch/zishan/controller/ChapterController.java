@@ -18,6 +18,13 @@ public class ChapterController {
     @Resource
     private ChapterService chapterService;
 
+    @DeleteMapping
+    public Result<String> deletedChapter(@RequestParam Long id) {
+        log.info("删除章节，id：" + id);
+        chapterService.removeById(id);
+        return Result.success("删除成功");
+    }
+
     @PutMapping
     public Result<Boolean> updateChapterName(@RequestBody Chapter chapter) {
         UpdateWrapper<Chapter> wrapper = new UpdateWrapper<>();

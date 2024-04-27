@@ -20,7 +20,6 @@ public class Chapter {
     private String name;
     private Long cardGroup;
     private Integer cardTotal;
-    @TableLogic
     private Integer isDeleted;
 
     @TableField(exist = false)

@@ -23,7 +23,6 @@ public class CardGroup {
     private Integer chapterTotal = 0;
     private Integer cardTotal = 0;
     private Integer isPublic;
-    @TableLogic
     private Integer isDeleted;
 
     @TableField(exist = false)

@@ -1,5 +1,6 @@
 package com.ch.zishan.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ch.zishan.mapper.CardGroupMapper;
 import com.ch.zishan.mapper.CardMapper;
@@ -46,7 +47,9 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
     }
 
     @Override
-    public Integer recoverCard(Long chapterId) {
-        return cardMapper.updateIsDeleted(chapterId);
+    public Integer deleteOrRecoverCardLogic(Long chapterId, Integer isDeleted) {
+        UpdateWrapper<Card> wrapper = new UpdateWrapper<>();
+        wrapper.eq("chapter", chapterId).set("is_deleted", isDeleted);
+        return cardMapper.update(null, wrapper);
     }
 }

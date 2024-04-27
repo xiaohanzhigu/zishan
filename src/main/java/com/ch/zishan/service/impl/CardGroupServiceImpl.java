@@ -1,6 +1,7 @@
 package com.ch.zishan.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ch.zishan.mapper.CardGroupMapper;
 import com.ch.zishan.pojo.Card;
@@ -20,29 +21,23 @@ import java.util.List;
 public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup> implements CardGroupService {
     @Resource
     private CardGroupMapper cardGroupMapper;
-
     @Resource
     private CardService cardService;
     @Resource
     private ChapterService chapterService;
-
-    public List<CardGroup> getDeleted(Long userId) {
-        List<CardGroup> list = cardGroupMapper.getAllByUserIdDeletedXml(userId);
-        return list;
-    }
 
     @Override
     public Integer recoverCardGroup(Long id) {
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
 
         // 恢复卡片集
-        cardGroupMapper.updateIsDeleted(id);
+        this.deleteOrRecoverCardGroupLogic(id, 0);
         // 恢复卡片集中的所有章节
-        chapterService.recoverChapter(id);
+        chapterService.deleteOrRecoverChapterLogic(id, 0);
         // 恢复每个章节中的卡片
         chapterWrapper.eq("card_group",id);
         chapterService.list(chapterWrapper).forEach(chapter -> {
-            cardService.recoverCard(chapter.getId());
+            cardService.deleteOrRecoverCardLogic(chapter.getId(), 0);
         });
         return 1;
     }
@@ -68,19 +63,25 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         chapterWrapper.eq("card_group", id);
         List<Chapter> chapterList = chapterService.list(chapterWrapper);
 
+        // 删除每个章节内的所有卡片
         chapterList.forEach(chapter -> {
-            cardWrapper.clear();
-            cardWrapper.eq("chapter", chapter.getId());
-            List<Card> cardList = cardService.list(cardWrapper);
-            // 删除每个章节内的所有卡片
-            cardService.remove(cardWrapper);
-            // 删除章节
-            chapterService.removeById(chapter.getId());
+            cardService.deleteOrRecoverCardLogic(chapter.getId(), 1);
         });
+        // 删除章节
+        chapterService.deleteOrRecoverChapterLogic(id, 1);
         // 删除卡片集
-        cardGroupMapper.deleteById(id);
+        this.deleteOrRecoverCardGroupLogic(id, 1);
 
         return true;
+    }
+
+
+    @Override
+    public Integer deleteOrRecoverCardGroupLogic(Long id, Integer isDeleted) {
+        UpdateWrapper<CardGroup> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", id)
+                .set("is_deleted", isDeleted);
+        return cardGroupMapper.update(null, wrapper);
     }
 
 }
