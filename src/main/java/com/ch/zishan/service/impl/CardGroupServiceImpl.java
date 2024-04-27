@@ -83,4 +83,9 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         return true;
     }
 
+    @Override
+    public CardGroup getOneByIdDeleted(Long id) {
+        return cardGroupMapper.getOneByIdDeleted(id);
+    }
+
 }

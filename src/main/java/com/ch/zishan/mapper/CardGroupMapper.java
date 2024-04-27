@@ -16,4 +16,7 @@ public interface CardGroupMapper extends BaseMapper<CardGroup> {
 
     @Update("update tb_card_group set is_deleted = 0 where id = #{id}")
     public Integer updateIsDeleted(Long id);
+
+    @Select("select * from tb_card_group where id = #{id}")
+    public CardGroup getOneByIdDeleted(Long id);
 }

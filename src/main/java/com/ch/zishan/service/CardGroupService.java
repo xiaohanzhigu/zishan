@@ -15,5 +15,6 @@ public interface CardGroupService extends IService<CardGroup> {
 
     public Integer recoverCardGroup(Long id);
 
+    public CardGroup getOneByIdDeleted(Long id);
 
 }
