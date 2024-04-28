@@ -55,6 +55,11 @@ public class CardGroupController {
         QueryWrapper<CardGroup> wrapper = new QueryWrapper<>();
         wrapper.eq("id", id);
         CardGroup cardGroup = cardGroupService.getOne(wrapper);
+
+        if (cardGroup == null) {
+            return Result.error("404","卡片集不存在");
+        }
+
         if (!SysUtils.checkUser(BaseContext.get(),cardGroup.getCreateUser())) {
             return Result.error("401", "无权限删除");
         }
@@ -71,6 +76,11 @@ public class CardGroupController {
         QueryWrapper<CardGroup> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", cardGroup.getId());
         CardGroup group = cardGroupService.getOne(queryWrapper);
+
+        if (group == null) {
+            return Result.error("404","卡片集不存在");
+        }
+
         if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
             return Result.error("401", "无权限恢复");
         }
@@ -103,6 +113,11 @@ public class CardGroupController {
 
         groupWrapper.eq("id",id);
         CardGroup group = cardGroupService.getOne(groupWrapper);
+
+        if (group == null) {
+            return Result.error("404","卡片集不存在");
+        }
+
         chapterWrapper.eq("card_group",group.getId());
         List<Chapter> chapters = chapterService.list(chapterWrapper);
         List<Chapter> chapterList = new ArrayList<>();

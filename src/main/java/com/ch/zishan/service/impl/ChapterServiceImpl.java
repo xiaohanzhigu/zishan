@@ -39,12 +39,12 @@ public class ChapterServiceImpl extends ServiceImpl<ChapterMapper, Chapter> impl
         cardGroup.setChapterTotal(cardGroup.getChapterTotal() + 1);
         cardGroupMapper.updateById(cardGroup);
 
-        Card card = new Card();
-        card.setType(9);
-        card.setContent("占位卡片");
-        card.setHeadline("占位卡片");
-        card.setChapter(chapter.getId());
-        cardService.addCard(card);
+//        Card card = new Card();
+//        card.setType(9);
+//        card.setContent("占位卡片");
+//        card.setHeadline("占位卡片");
+//        card.setChapter(chapter.getId());
+//        cardService.addCard(card);
 
         return true;
     }
