@@ -54,6 +54,23 @@ public class CardController {
         return Result.success("删除成功");
     }
 
+    @PutMapping
+    public Result<String> editCard(@RequestBody Card card) {
+        log.info("编辑卡片" + card.toString());
+        QueryWrapper<Card> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", card.getId());
+        Card oldCard = cardService.getOne(wrapper);
+        if (oldCard == null) {
+            return Result.error("404","卡片不存在");
+        }
+
+        if (!SysUtils.checkUser(BaseContext.get(), oldCard.getCreateUser())) {
+            return Result.error("401", "无权限编辑");
+        }
+        cardService.updateById(card);
+        return Result.success("编辑成功");
+    }
+
     @PostMapping
     public Result<String> addCard(@RequestBody Card card) {
         log.info("添加卡片" + card.toString());
