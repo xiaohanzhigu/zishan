@@ -39,12 +39,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public User register(User user) {
-        return null;
+        userMapper.insert(user);
+        return user;
     }
 
     @Override
     public void resetPassword(User user) {
 
+    }
+
+    @Override
+    public User selectByUsername(String username) {
+        QueryWrapper<User> wrapper = new QueryWrapper<User>().eq("username", username);
+        return userMapper.selectOne(wrapper);
     }
 
 }

@@ -22,13 +22,18 @@ public class User {
     // 1删除，0不删除
     @TableLogic
     private Integer isDeleted;
-    //创建时间
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    //更新时间
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    @TableField(fill = FieldFill.INSERT)
+    private Long createUser;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Long updateUser;
 
     @TableField(exist = false)
     private String token;

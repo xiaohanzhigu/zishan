@@ -10,4 +10,8 @@ public class BaseContext {
     public static void set(Long id) {
         threadLocal.set(id);
     }
+
+    public static void remove() {
+        threadLocal.remove();
+    }
 }

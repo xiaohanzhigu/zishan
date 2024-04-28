@@ -10,4 +10,7 @@ public interface UserService extends IService<User> {
     public User register(User user);
 
     public void resetPassword(User user);
+
+    public User selectByUsername(String username);
+
 }
