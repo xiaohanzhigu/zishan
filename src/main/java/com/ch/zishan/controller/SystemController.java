@@ -1,12 +1,19 @@
 package com.ch.zishan.controller;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ch.zishan.common.BaseContext;
 import com.ch.zishan.common.Result;
 import com.ch.zishan.interceptor.AuthAccess;
+import com.ch.zishan.pojo.CardGroup;
+import com.ch.zishan.pojo.Collect;
+import com.ch.zishan.pojo.Share;
 import com.ch.zishan.pojo.User;
-import com.ch.zishan.service.UserService;
+import com.ch.zishan.service.*;
+import com.ch.zishan.utils.SysUtils;
+import com.ch.zishan.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -17,7 +24,85 @@ import javax.annotation.Resource;
 public class SystemController {
     @Resource
     private UserService userService;
+    @Resource
+    private CollectService collectService;
+    @Resource
+    private ShareService shareService;
+    @Resource
+    private CardGroupService cardGroupService;
 
+    @AuthAccess
+    @GetMapping("/shareList/{code}")
+    public Result<CardGroup> shareList(@PathVariable String code) {
+        if (StrUtil.isBlank(code)) {
+            return Result.error("404","分享码错误");
+        }
+        Share share = shareService
+                .getOne(new QueryWrapper<Share>().eq("share_code", code));
+        if (share == null) {
+            return Result.error("404","分享码不存在");
+        }
+        CardGroup group = cardGroupService.getById(share.getCardGroupId());
+        if (group == null) {
+            return Result.error("404","卡片集不存在");
+        }
+        if (group.getIsPublic() == 0 ||group.getIsDeleted() == 1) {
+            return Result.error("404","该分享码已失效");
+        }
+        group = cardGroupService.getCardGroupById(group.getId());
+        return Result.success(group);
+    }
+
+    @PostMapping("/share")
+    public Result<String> share(@RequestBody Share share) {
+        CardGroup group = cardGroupService.getById(share.getCardGroupId());
+        if (group == null) {
+            return Result.error("404","卡片集不存在");
+        }
+        if (group.getIsPublic() == 0) {
+            return Result.error("404","卡片集不公开");
+        }
+        if (group.getIsDeleted() == 1) {
+            return Result.error("404","卡片集不存在");
+        }
+        share.setUserId(BaseContext.get());
+//        share.setCardGroupId(cardGroupId);
+        share.setShareCode(RandomStringUtils.randomAlphanumeric(10));
+        shareService.save(share);
+        return Result.success(share.getShareCode());
+    }
+
+    @PostMapping("/collect/{shareCode}")
+    public Result<String> collect(@PathVariable String shareCode) {
+        if (StrUtil.isBlank(shareCode)) {
+            return Result.error("404","分享码错误");
+        }
+        Share share = shareService
+                .getOne(new QueryWrapper<Share>().eq("share_code", shareCode));
+        if (share == null) {
+            return Result.error("404","分享码不存在");
+        }
+        CardGroup group = cardGroupService.getById(share.getCardGroupId());
+        if (group == null) {
+            return Result.error("404","卡片集不存在");
+        }
+        if (group.getIsPublic() == 0 ||group.getIsDeleted() == 1) {
+            return Result.error("404","该分享码已失效");
+        }
+        if (SysUtils.checkUser(group.getCreateUser(), BaseContext.get()) ||
+                collectService.getOne(new QueryWrapper<Collect>()
+                        .eq("user_id", BaseContext.get())
+                        .eq("card_group_id", share.getCardGroupId())) != null){
+            return Result.error("404","已经收藏过了");
+        }
+
+        Collect collect = new Collect();
+        collect.setUserId(BaseContext.get());
+        collect.setCardGroupId(share.getCardGroupId());
+        collect.setCollectDate(TimeUtils.getCurrentTimeStamp());
+        collectService.addCollect(collect);
+        return Result.success("收藏成功");
+    }
 
     @GetMapping("/logout")
     public Result<String> logout() {

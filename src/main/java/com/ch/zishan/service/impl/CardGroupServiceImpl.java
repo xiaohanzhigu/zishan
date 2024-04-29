@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -101,6 +102,19 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         wrapper.eq("id", id)
                 .set("is_deleted", isDeleted);
         return cardGroupMapper.update(null, wrapper);
+    }
+
+    @Override
+    public CardGroup getCardGroupById(Long id) {
+        CardGroup cardGroup = cardGroupMapper.selectById(id);
+        List<Chapter> chapterList = new ArrayList<>();
+        chapterService.list(new QueryWrapper<Chapter>().eq("card_group",id)).forEach(chapter -> {
+            List<Card> cards = cardService.list(new QueryWrapper<Card>().eq("chapter", chapter.getId()));
+            chapter.setCardList(cards);
+            chapterList.add(chapter);
+        });
+        cardGroup.setChapterList(chapterList);
+        return cardGroup;
     }
 
 }

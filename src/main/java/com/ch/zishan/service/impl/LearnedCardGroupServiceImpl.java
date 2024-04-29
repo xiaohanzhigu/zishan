@@ -54,7 +54,7 @@ public class LearnedCardGroupServiceImpl extends ServiceImpl<LearnedCardGroupMap
             cardList.forEach(card -> {
                 LearnedCard learnedCard = new LearnedCard();
                 learnedCard.setCardId(card.getId());
-                learnedCard.setLearnedCardGroupId(cardGroupId);
+                learnedCard.setLearnedCardGroupId(learnedCardGroup.getId());
                 learnedCardMapper.insert(learnedCard);
             });
         });

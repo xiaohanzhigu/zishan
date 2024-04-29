@@ -52,14 +52,13 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
         cardGroup.setCardTotal(cardGroup.getCardTotal() + 1);
         cardGroupMapper.updateById(cardGroup);
 
-        // 将卡片加入到学习卡片集中
-        LearnedCard learnedCard = new LearnedCard();
-        learnedCard.setCardId(card.getId());
         // 将该卡片加入到该卡片组的所有学习卡片集中，包括分享出去的卡片集
         QueryWrapper<LearnedCardGroup> queryWrapper = new QueryWrapper<LearnedCardGroup>()
                 .eq("card_group_id", chapter.getCardGroup());
         learnedCardGroupMapper.selectList(queryWrapper).forEach(learnedCardGroup -> {
             // 添加对应的学习计划
+            LearnedCard learnedCard = new LearnedCard();
+            learnedCard.setCardId(card.getId());
             learnedCard.setLearnedCardGroupId(learnedCardGroup.getId());
             learnedCardMapper.insert(learnedCard);
             // 更新学习计划的卡片数量

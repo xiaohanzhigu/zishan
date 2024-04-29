@@ -34,6 +34,30 @@ public class CardGroupController {
     @Resource
     private ChapterService chapterService;
 
+    @PutMapping("/open")
+    public Result<String> isPublic(@RequestBody CardGroup cardGroup) {
+        log.info("设置卡片集是否公开，id：" + cardGroup.getId());
+        // 只有创建卡片集者才可以设置
+        QueryWrapper<CardGroup> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", cardGroup.getId());
+        CardGroup group = cardGroupService.getOne(wrapper);
+
+        if (group == null) {
+            return Result.error("404","卡片集不存在");
+        }
+
+        if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
+            return Result.error("404", "无权限设置");
+        }
+
+        UpdateWrapper<CardGroup> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", cardGroup.getId())
+                .set("is_public", cardGroup.getIsPublic());
+        cardGroupService.update(updateWrapper);
+        log.info("设置卡片集是否公开成功，id：" + cardGroup.getId());
+        return Result.success("设置成功");
+    }
+
     @PutMapping("/recover")
     public Result<String> recoverCardGroup(@RequestBody CardGroup cardGroup) {
         log.info("恢复卡片集，id：" + cardGroup.getId());
