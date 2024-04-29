@@ -9,5 +9,7 @@ public interface CardService extends IService<Card> {
 
     public boolean addCard(Card card);
 
-    public Integer deleteOrRecoverCardLogic(Long chapterId, Integer isDeleted);
+    public Integer deleteOrRecoverCardLogic(Long cardId, Integer isDeleted);
+
+    public Integer deleteCard(Long cardId);
 }

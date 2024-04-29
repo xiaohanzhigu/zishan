@@ -3,6 +3,7 @@ package com.ch.zishan.pojo;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
@@ -10,7 +11,9 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Card {
+public class Card implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @TableId(type= IdType.AUTO)
     private Long id;
     private Long chapter;

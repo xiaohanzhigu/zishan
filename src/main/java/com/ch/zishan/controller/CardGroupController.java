@@ -13,6 +13,7 @@ import com.ch.zishan.service.CardService;
 import com.ch.zishan.service.ChapterService;
 import com.ch.zishan.utils.SysUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -23,6 +24,7 @@ import java.util.List;
 @Slf4j
 @CrossOrigin
 @RestController
+@Transactional
 @RequestMapping("/cardGroup")
 public class CardGroupController {
     @Resource
@@ -69,6 +71,7 @@ public class CardGroupController {
     }
 
     @PutMapping
+    // 更改卡片集名称
     public Result<String> updateCardGroup(@RequestBody CardGroup cardGroup) {
         log.info("更新卡片集，id：" + cardGroup.getId());
 

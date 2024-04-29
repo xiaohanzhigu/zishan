@@ -1,10 +1,9 @@
 package com.ch.zishan.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ch.zishan.mapper.CardGroupMapper;
-import com.ch.zishan.mapper.CardMapper;
-import com.ch.zishan.mapper.ChapterMapper;
+import com.ch.zishan.mapper.*;
 import com.ch.zishan.pojo.Card;
 import com.ch.zishan.pojo.CardGroup;
 import com.ch.zishan.pojo.Chapter;
@@ -21,15 +20,16 @@ public class ChapterServiceImpl extends ServiceImpl<ChapterMapper, Chapter> impl
 
     @Resource
     private ChapterMapper chapterMapper;
-
     @Resource
     private CardMapper cardMapper;
-
-    @Resource
-    private CardGroupMapper cardGroupMapper;
-
     @Resource
     private CardService cardService;
+    @Resource
+    private CardGroupMapper cardGroupMapper;
+    @Resource
+    private LearnedCardMapper learnedCardMapper;
+    @Resource
+    private LearnedCardGroupMapper learnedCardGroupMapper;
 
     @Override
     public boolean addChapter(Chapter chapter) {
@@ -38,13 +38,6 @@ public class ChapterServiceImpl extends ServiceImpl<ChapterMapper, Chapter> impl
         CardGroup cardGroup = cardGroupMapper.selectById(chapter.getCardGroup());
         cardGroup.setChapterTotal(cardGroup.getChapterTotal() + 1);
         cardGroupMapper.updateById(cardGroup);
-
-//        Card card = new Card();
-//        card.setType(9);
-//        card.setContent("占位卡片");
-//        card.setHeadline("占位卡片");
-//        card.setChapter(chapter.getId());
-//        cardService.addCard(card);
 
         return true;
     }
@@ -58,11 +51,15 @@ public class ChapterServiceImpl extends ServiceImpl<ChapterMapper, Chapter> impl
 
     @Override
     public Integer deleteChapter(Long id) {
-        UpdateWrapper<Card> wrapper = new UpdateWrapper<>();
-        wrapper.eq("chapter", id);
-        cardMapper.delete(wrapper);
-        chapterMapper.deleteById(id);
+        // 删除卡片集中的卡片和对应的学习计划
+        QueryWrapper<Card> cardQueryWrapper = new QueryWrapper<>();
+        cardQueryWrapper.eq("chapter", id);
+        cardMapper.selectList(cardQueryWrapper).forEach(card -> {
+            cardService.deleteCard(card.getId());
+        });
 
+        // 删除章节
+        chapterMapper.deleteById(id);
         return 1;
     }
 }

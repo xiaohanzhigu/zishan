@@ -50,7 +50,7 @@ public class CardController {
         if (!SysUtils.checkUser(BaseContext.get(), card.getCreateUser())) {
             return Result.error("401", "无权限删除");
         }
-        cardService.removeById(id);
+        cardService.deleteCard(id);
         return Result.success("删除成功");
     }
 

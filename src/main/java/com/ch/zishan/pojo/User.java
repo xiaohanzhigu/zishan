@@ -3,13 +3,14 @@ package com.ch.zishan.pojo;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @TableName("tb_user")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(type= IdType.AUTO)

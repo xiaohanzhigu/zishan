@@ -7,9 +7,7 @@ import com.ch.zishan.mapper.CardGroupMapper;
 import com.ch.zishan.pojo.Card;
 import com.ch.zishan.pojo.CardGroup;
 import com.ch.zishan.pojo.Chapter;
-import com.ch.zishan.service.CardGroupService;
-import com.ch.zishan.service.CardService;
-import com.ch.zishan.service.ChapterService;
+import com.ch.zishan.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,20 +23,31 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
     private CardService cardService;
     @Resource
     private ChapterService chapterService;
+    @Resource
+    private LearnedCardGroupService learnedCardGroupService;
+    @Resource
+    private LearnedCardService learnedCardService;
 
     @Override
-    public Integer recoverCardGroup(Long id) {
+    public Integer recoverCardGroup(Long cardGroupId) {
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
+        QueryWrapper<Card> cardQueryWrapper = new QueryWrapper<>();
 
-        // 恢复卡片集
-        this.deleteOrRecoverCardGroupLogic(id, 0);
+        // 恢复卡片集和对应的学习卡片集
+        this.deleteOrRecoverCardGroupLogic(cardGroupId, 0);
+        learnedCardGroupService.deleteOrRecoverLearnedCardGroupLogic(cardGroupId, 0);
         // 恢复卡片集中的所有章节
-        chapterService.deleteOrRecoverChapterLogic(id, 0);
-        // 恢复每个章节中的卡片
-        chapterWrapper.eq("card_group",id);
+        chapterService.deleteOrRecoverChapterLogic(cardGroupId, 0);
+        // 恢复每个章节中的卡片和对应的学习卡片
+        chapterWrapper.eq("card_group",cardGroupId);
         chapterService.list(chapterWrapper).forEach(chapter -> {
-            cardService.deleteOrRecoverCardLogic(chapter.getId(), 0);
-        });
+            cardQueryWrapper.clear();
+            cardQueryWrapper.eq("chapter",chapter.getId());
+            cardService.list(cardQueryWrapper).forEach(card -> {
+                cardService.deleteOrRecoverCardLogic(card.getId(),0);
+                learnedCardService.deleteOrRecoverLearnedCardLogic(card.getId(),0);
+            });
+       });
         return 1;
     }
 
@@ -51,27 +60,37 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         chapter.setCardGroup(cardGroup.getId());
         chapterService.addChapter(chapter);
 
+        // 将卡片集加入到学习卡片集中
+        learnedCardGroupService.addCardGroupToLearnedCardGroup(cardGroup.getUser(), cardGroup.getId());
+
         return id;
     }
 
     @Override
-    public boolean deleteCardGroup(Long id) {
+    public boolean deleteCardGroup(Long cardGroupId) {
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
         QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
 
         // 当前卡片集内的所有章节
-        chapterWrapper.eq("card_group", id);
+        chapterWrapper.eq("card_group", cardGroupId);
         List<Chapter> chapterList = chapterService.list(chapterWrapper);
 
-        // 删除每个章节内的所有卡片
+        // 删除每个章节内的所有卡片和对应的学习卡片
         chapterList.forEach(chapter -> {
-            cardService.deleteOrRecoverCardLogic(chapter.getId(), 1);
+            cardWrapper.clear();
+            cardWrapper.eq("chapter", chapter.getId());
+            List<Card> cardList = cardService.list(cardWrapper);
+            cardList.forEach(card -> {
+                cardService.deleteOrRecoverCardLogic(card.getId(), 1);
+                learnedCardService.deleteOrRecoverLearnedCardLogic(card.getId(), 1);
+            });
         });
-        // 删除章节
-        chapterService.deleteOrRecoverChapterLogic(id, 1);
-        // 删除卡片集
-        this.deleteOrRecoverCardGroupLogic(id, 1);
 
+        // 删除章节
+        chapterService.deleteOrRecoverChapterLogic(cardGroupId, 1);
+        // 删除卡片集和对应的学习卡片集
+        this.deleteOrRecoverCardGroupLogic(cardGroupId, 1);
+        learnedCardGroupService.deleteOrRecoverLearnedCardGroupLogic(cardGroupId, 1);
         return true;
     }
 
