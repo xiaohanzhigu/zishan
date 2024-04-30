@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ch.zishan.mapper.CardGroupMapper;
-import com.ch.zishan.pojo.Card;
-import com.ch.zishan.pojo.CardGroup;
-import com.ch.zishan.pojo.Chapter;
+import com.ch.zishan.pojo.*;
 import com.ch.zishan.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,6 +91,35 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         this.deleteOrRecoverCardGroupLogic(cardGroupId, 1);
         learnedCardGroupService.deleteOrRecoverLearnedCardGroupLogic(cardGroupId, 1);
         return true;
+    }
+
+    @Override
+    public void allDeleteCardGroup(Long cardGroupId) {
+        // 彻底删除
+        QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
+        QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
+
+        // 当前卡片集内的所有章节
+        chapterWrapper.eq("card_group", cardGroupId);
+        List<Chapter> chapterList = chapterService.list(chapterWrapper);
+
+        // 删除每个章节内的所有卡片和对应的学习卡片
+        chapterList.forEach(chapter -> {
+            cardWrapper.clear();
+            cardWrapper.eq("chapter", chapter.getId());
+            List<Card> cardList = cardService.list(cardWrapper);
+            cardList.forEach(card -> {
+                cardService.removeById(card.getId());
+                learnedCardService.remove(new QueryWrapper<LearnedCard>().eq("card_id", card.getId()));
+            });
+        });
+
+        // 删除章节
+        chapterService.remove(new QueryWrapper<Chapter>().eq("card_group", cardGroupId));
+        // 删除卡片集和对应的学习卡片集
+        this.removeById(cardGroupId);
+        learnedCardGroupService.remove(new QueryWrapper<LearnedCardGroup>().eq("card_group_id", cardGroupId));
+
     }
 
 

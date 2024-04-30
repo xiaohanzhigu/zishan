@@ -13,6 +13,8 @@ public interface CardGroupService extends IService<CardGroup> {
 
     public Integer deleteOrRecoverCardGroupLogic(Long id, Integer isDeleted);
 
+    public void allDeleteCardGroup(Long id);
+
     public CardGroup getCardGroupById(Long id);
 
 }

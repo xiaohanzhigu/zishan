@@ -91,10 +91,30 @@ public class CardGroupController {
         }
 
         if (!SysUtils.checkUser(BaseContext.get(),cardGroup.getCreateUser())) {
-            return Result.error("401", "无权限删除");
+            return Result.error("404", "无权限删除");
         }
         cardGroupService.deleteCardGroup(id);
         log.info("删除卡片集成功，id：" + id);
+        return Result.success("删除成功");
+    }
+
+    @DeleteMapping("/all")
+    public Result<String> allDeleteCardGroup(@RequestParam Long id) {
+        log.info("永久删除卡片集，id：" + id);
+        // 只有创建卡片集者才可以删除
+        QueryWrapper<CardGroup> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        CardGroup cardGroup = cardGroupService.getOne(wrapper);
+
+        if (cardGroup == null) {
+            return Result.error("404","卡片集不存在");
+        }
+
+        if (!SysUtils.checkUser(BaseContext.get(),cardGroup.getCreateUser())) {
+            return Result.error("404", "无权限删除");
+        }
+        cardGroupService.allDeleteCardGroup(id);
+        log.info("永久删除卡片集成功，id：" + id);
         return Result.success("删除成功");
     }
 
