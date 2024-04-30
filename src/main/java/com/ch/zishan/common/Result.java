@@ -24,6 +24,14 @@ public class Result<T> {
         return result;
     }
 
+    public static <T> Result<T> success(T object, String msg) {
+        Result result = new Result();
+        result.code = "200";
+        result.data = object;
+        result.msg = msg;
+        return result;
+    }
+
     public static <T> Result<T> success(String code,String msg) {
         Result result = new Result();
         result.msg = msg;

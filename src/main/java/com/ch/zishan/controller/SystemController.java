@@ -72,6 +72,16 @@ public class SystemController {
         return Result.success(share.getShareCode());
     }
 
+    @DeleteMapping("/collect")
+    public Result<String> cancelCollect(@RequestParam Long cardGroupId) {
+        if (cardGroupId == null) {
+            return Result.error("404","收藏不存在");
+        }
+        collectService.deleteCollect(BaseContext.get(), cardGroupId);
+        return Result.success("取消收藏成功");
+
+    }
+
     @PostMapping("/collect/{shareCode}")
     public Result<String> collect(@PathVariable String shareCode) {
         if (StrUtil.isBlank(shareCode)) {

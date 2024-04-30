@@ -66,4 +66,16 @@ public class LearnedCardGroupServiceImpl extends ServiceImpl<LearnedCardGroupMap
         updateWrapper.eq("card_group_id", cardGroupId).set("is_deleted", isDeleted);
         return learnedCardGroupMapper.update(null, updateWrapper);
     }
+
+    @Override
+    public void deleteLearnedCardGroup(Long userId, Long cardGroupId) {
+        QueryWrapper<LearnedCardGroup> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId).eq("card_group_id", cardGroupId);
+        LearnedCardGroup learnedCardGroup = learnedCardGroupMapper.selectOne(wrapper);
+        if (learnedCardGroup == null) {
+            return;
+        }
+        learnedCardMapper.delete(new QueryWrapper<LearnedCard>().eq("learned_card_group_id", learnedCardGroup.getId()));
+        learnedCardGroupMapper.delete(wrapper);
+    }
 }

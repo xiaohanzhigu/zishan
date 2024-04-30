@@ -9,4 +9,5 @@ public interface LearnedCardGroupService extends IService<LearnedCardGroup> {
 
     public Integer deleteOrRecoverLearnedCardGroupLogic(Long cardGroupId, Integer isDeleted);
 
+    public void deleteLearnedCardGroup(Long userId,Long cardGroupId);
 }

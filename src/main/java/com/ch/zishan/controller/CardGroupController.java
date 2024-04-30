@@ -8,9 +8,11 @@ import com.ch.zishan.common.Result;
 import com.ch.zishan.pojo.Card;
 import com.ch.zishan.pojo.CardGroup;
 import com.ch.zishan.pojo.Chapter;
+import com.ch.zishan.pojo.Collect;
 import com.ch.zishan.service.CardGroupService;
 import com.ch.zishan.service.CardService;
 import com.ch.zishan.service.ChapterService;
+import com.ch.zishan.service.CollectService;
 import com.ch.zishan.utils.SysUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,8 @@ public class CardGroupController {
     private CardService cardService;
     @Resource
     private ChapterService chapterService;
+    @Resource
+    private CollectService collectService;
 
     @PutMapping("/open")
     public Result<String> isPublic(@RequestBody CardGroup cardGroup) {
@@ -162,12 +166,21 @@ public class CardGroupController {
             chapterList.add(one);
         }
         group.setChapterList(chapterList);
-        return Result.success(group);
+
+        String msg;
+        if (group.getCreateUser().equals(BaseContext.get())) {
+            msg = "0";
+        } else {
+            msg = "1"; // 不是创建者
+        }
+
+        return Result.success(group,msg);
     }
 
     @GetMapping("/allCardGroup")
     public Result<List<CardGroup>> allCardGroup(HttpServletRequest request, @RequestParam String type) {
         String token = request.getHeader("Token");
+        String msg = "0";
         Long id = Long.valueOf(JWT.decode(token).getAudience().get(0));
         log.info("查询卡片集用户：" + id);
         log.info("查询卡片集类型：" + type);
@@ -181,6 +194,25 @@ public class CardGroupController {
         } else if("回收站".equals(type)) {
             cardGroupWrapper.eq("user", id)
                     .eq("is_deleted", 1);
+        } else if("我的收藏".equals(type)) {
+            msg = "1";
+            QueryWrapper<Collect> collectQueryWrapper = new QueryWrapper<Collect>()
+                    .eq("user_id", BaseContext.get())
+                    .eq("is_deleted", 0);
+            List<Collect> collectList = collectService.list(collectQueryWrapper);
+            List<Long> cardGroupIds = new ArrayList<>();
+            for (Collect collect : collectList) {
+                cardGroupIds.add(collect.getCardGroupId());
+            }
+            if (!cardGroupIds.isEmpty()) {
+                cardGroupWrapper.in("id", cardGroupIds).eq("is_deleted", 0);
+            } else {
+                return Result.success(new ArrayList<>());
+            }
+
+
+        } else {
+            return Result.error("404","类型错误");
         }
 
         List<CardGroup> list = cardGroupService.list(cardGroupWrapper);
@@ -192,6 +224,6 @@ public class CardGroupController {
             group.setChapterList(chapterList);
         }
 
-        return Result.success(list);
+        return Result.success(list,msg);
     }
 }
