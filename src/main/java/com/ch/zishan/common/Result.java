@@ -42,7 +42,7 @@ public class Result<T> {
     public static <T> Result<T> error(String msg) {
         Result result = new Result();
         result.msg = msg;
-        result.code = "401";
+        result.code = "404";
         return result;
     }
 

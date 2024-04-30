@@ -47,11 +47,11 @@ public class CardGroupController {
         CardGroup group = cardGroupService.getOne(wrapper);
 
         if (group == null) {
-            return Result.error("404","卡片集不存在");
+            return Result.error("卡片集不存在");
         }
 
         if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
-            return Result.error("404", "无权限设置");
+            return Result.error( "无权限设置");
         }
 
         UpdateWrapper<CardGroup> updateWrapper = new UpdateWrapper<>();
@@ -71,7 +71,7 @@ public class CardGroupController {
         wrapper.eq("id", cardGroup.getId()).eq("is_deleted", 1);
         CardGroup group = cardGroupService.getOne(wrapper);
         if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
-            return Result.error("401", "无权限恢复");
+            return Result.error("无权限恢复");
         }
 
         cardGroupService.recoverCardGroup(cardGroup.getId());
@@ -87,11 +87,11 @@ public class CardGroupController {
         CardGroup cardGroup = cardGroupService.getOne(wrapper);
 
         if (cardGroup == null) {
-            return Result.error("404","卡片集不存在");
+            return Result.error("卡片集不存在");
         }
 
         if (!SysUtils.checkUser(BaseContext.get(),cardGroup.getCreateUser())) {
-            return Result.error("404", "无权限删除");
+            return Result.error("无权限删除");
         }
         cardGroupService.deleteCardGroup(id);
         log.info("删除卡片集成功，id：" + id);
@@ -107,11 +107,11 @@ public class CardGroupController {
         CardGroup cardGroup = cardGroupService.getOne(wrapper);
 
         if (cardGroup == null) {
-            return Result.error("404","卡片集不存在");
+            return Result.error("卡片集不存在");
         }
 
         if (!SysUtils.checkUser(BaseContext.get(),cardGroup.getCreateUser())) {
-            return Result.error("404", "无权限删除");
+            return Result.error( "无权限删除");
         }
         cardGroupService.allDeleteCardGroup(id);
         log.info("永久删除卡片集成功，id：" + id);
@@ -129,11 +129,11 @@ public class CardGroupController {
         CardGroup group = cardGroupService.getOne(queryWrapper);
 
         if (group == null) {
-            return Result.error("404","卡片集不存在");
+            return Result.error("卡片集不存在");
         }
 
         if (!SysUtils.checkUser(BaseContext.get(),group.getCreateUser())) {
-            return Result.error("401", "无权限恢复");
+            return Result.error("无权限恢复");
         }
 
         UpdateWrapper<CardGroup> wrapper = new UpdateWrapper<>();
@@ -166,7 +166,7 @@ public class CardGroupController {
         CardGroup group = cardGroupService.getOne(groupWrapper);
 
         if (group == null) {
-            return Result.error("404","卡片集不存在");
+            return Result.error("卡片集不存在");
         }
 
         chapterWrapper.eq("card_group",group.getId());
@@ -232,7 +232,7 @@ public class CardGroupController {
 
 
         } else {
-            return Result.error("404","类型错误");
+            return Result.error("类型错误");
         }
 
         List<CardGroup> list = cardGroupService.list(cardGroupWrapper);

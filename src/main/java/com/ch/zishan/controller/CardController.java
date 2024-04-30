@@ -32,7 +32,7 @@ public class CardController {
         wrapper.eq("id", id);
         Card card = cardService.getOne(wrapper);
         if (card == null) {
-            return Result.error("404","卡片不存在");
+            return Result.error("卡片不存在");
         }
         return Result.success(card);
     }
@@ -44,11 +44,11 @@ public class CardController {
         wrapper.eq("id", id);
         Card card = cardService.getOne(wrapper);
         if (card == null) {
-            return Result.error("404","卡片不存在");
+            return Result.error("卡片不存在");
         }
 
         if (!SysUtils.checkUser(BaseContext.get(), card.getCreateUser())) {
-            return Result.error("401", "无权限删除");
+            return Result.error("无权限删除");
         }
         cardService.deleteCard(id);
         return Result.success("删除成功");
@@ -61,11 +61,11 @@ public class CardController {
         wrapper.eq("id", card.getId());
         Card oldCard = cardService.getOne(wrapper);
         if (oldCard == null) {
-            return Result.error("404","卡片不存在");
+            return Result.error("卡片不存在");
         }
 
         if (!SysUtils.checkUser(BaseContext.get(), oldCard.getCreateUser())) {
-            return Result.error("401", "无权限编辑");
+            return Result.error( "无权限编辑");
         }
         cardService.updateById(card);
         return Result.success("编辑成功");
@@ -80,7 +80,7 @@ public class CardController {
         Chapter chapter = chapterService.getOne(wrapper);
 
         if (chapter == null) {
-            return Result.error("404","章节不存在");
+            return Result.error("章节不存在");
         }
         log.info("用户" + BaseContext.get() + "添加卡片" + chapter.toString());
         if (!SysUtils.checkUser(BaseContext.get(), chapter.getCreateUser())) {

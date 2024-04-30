@@ -129,13 +129,13 @@ public class SystemController {
         }
 
         if (userService.selectByUsername(user.getUsername()) != null) {
-            return Result.error("400","用户名已存在");
+            return Result.error("404","用户名已存在");
         }
         user.setNickname(user.getUsername());
         user = userService.register(user);
 
         if (user == null) {
-            return Result.error("400","注册失败");
+            return Result.error("404","注册失败");
         }
         return Result.success(user);
     }
