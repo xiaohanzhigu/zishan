@@ -47,8 +47,8 @@ public class LearnedCardServiceImpl extends ServiceImpl<LearnedCardMapper, Learn
         learnedCardQueryWrapper.eq("learned_card_group_id", learnedCardGroup.getId())
                 .eq("master_degree", 0);
         List<LearnedCard> learnedCardList = learnedCardMapper.selectList(learnedCardQueryWrapper);
-        // 查出今日还需学习的数量
-        int num = learnedCardGroup.getDayPlanNum() - recordService.getTodayLearnedNumByUserId(BaseContext.get());
+        // 查出每次需学习的数量
+        int num = learnedCardGroup.getPerPlanNum();
         if (num > learnedCardList.size()) {
             num = learnedCardList.size();
         }

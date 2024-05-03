@@ -25,7 +25,7 @@ public class LearnedCardGroup implements Serializable {
     private Integer total;
     private Integer learnedNum;
     private Integer reviewNum;
-    private Integer dayPlanNum;
+    private Integer perPlanNum;
     private Integer isDeleted;
 
     @TableField(exist = false)

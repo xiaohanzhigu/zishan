@@ -32,9 +32,9 @@ public class LearnedCardGroupController {
     @Resource
     private CardGroupService cardGroupService;
 
-    @GetMapping("/dayPlan")
+    @GetMapping("/perPlan")
     public Result<Integer> getDayPlanNum(@RequestParam Long cardGroupId) {
-        log.info("获取今日计划学习数量");
+        log.info("获取每次计划学习数量");
         CardGroup group = cardGroupService.getById(cardGroupId);
         QueryWrapper<LearnedCardGroup> wrapper = new QueryWrapper<>();
         wrapper.eq("card_group_id", cardGroupId)
@@ -46,14 +46,14 @@ public class LearnedCardGroupController {
             return Result.error("卡片集不存在");
         }
 
-        return Result.success(learnedGroup.getDayPlanNum(),String.valueOf(group.getCardTotal()));
+        return Result.success(learnedGroup.getPerPlanNum(),String.valueOf(group.getCardTotal()));
     }
 
-    @PutMapping("/dayPlan")
+    @PutMapping("/perPlan")
     public Result<String> setDayPlanNum(@RequestBody Map<String,Object> map) {
-        log.info("设置今日计划学习数量" + map);
+        log.info("设置每次计划学习数量" + map);
         long cardGroupId = Long.parseLong(map.get("cardGroupId").toString());
-        int dayPlan = Integer.parseInt(map.get("dayPlan").toString());
+        int perPlan = Integer.parseInt(map.get("perPlan").toString());
 
         CardGroup group = cardGroupService.getById(cardGroupId);
         QueryWrapper<LearnedCardGroup> wrapper = new QueryWrapper<>();
@@ -65,10 +65,10 @@ public class LearnedCardGroupController {
         if (learnedGroup == null) {
             return Result.error("卡片集不存在");
         }
-        if (dayPlan > group.getCardTotal() || dayPlan < 0) {
+        if (perPlan > group.getCardTotal() || perPlan < 0) {
             return Result.error("超出范围");
         }
-        learnedGroup.setDayPlanNum(dayPlan);
+        learnedGroup.setPerPlanNum(perPlan);
         learnedCardGroupService.updateById(learnedGroup);
         return Result.success("设置成功");
     }
@@ -109,7 +109,7 @@ public class LearnedCardGroupController {
         }
         List<Card> cardList = learnedCardService.getLearnedCardList(learnedGroup);
         if (cardList == null || cardList.isEmpty()) {
-            return Result.success("201", "该卡片集已学习完毕");
+            return Result.success("201", "该卡片集已经没有需要学下的卡片了");
         }
         return Result.success(cardList);
     }
