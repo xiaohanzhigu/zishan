@@ -23,8 +23,41 @@ public class RecordServiceImpl extends ServiceImpl<RecordMapper, Record> impleme
         QueryWrapper<Record> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId)
                 .between("time", TimeUtils.getTodayStartStamp(), TimeUtils.getTodayEndStamp());
-        return recordMapper.selectOne(wrapper);
+        Record record = recordMapper.selectOne(wrapper);
+        if (record == null) {
+            record = new Record();
+            record.setUserId(userId);
+            record.setTime(TimeUtils.getCurrentDateStamp());
+            recordMapper.insert(record);
+        }
+        return record;
     }
 
-//    public Record getRecordByUserIdAndData(Long userId, Long )
+    @Override
+    public Integer getTodayLearnedNumByUserId(Long userId) {
+        Record record = getTodayRecordByUserId(userId);
+        return record.getLearnedNum();
+    }
+
+    @Override
+    public void dayPlanNumAddOne(Long userId) {
+        Record record = getTodayRecordByUserId(userId);
+            record.setLearnedNum(record.getLearnedNum() + 1);
+            recordMapper.updateById(record);
+    }
+
+    @Override
+    public void editNumAddOne(Long userId) {
+        Record record = getTodayRecordByUserId(userId);
+        record.setEditNum(record.getEditNum() + 1);
+        recordMapper.updateById(record);
+    }
+
+    @Override
+    public void addNumAddOne(Long userId) {
+        Record record = getTodayRecordByUserId(userId);
+        record.setAddNum(record.getAddNum() + 1);
+        recordMapper.updateById(record);
+    }
+
 }

@@ -8,7 +8,6 @@ import com.ch.zishan.mapper.*;
 import com.ch.zishan.pojo.*;
 import com.ch.zishan.service.CardService;
 import com.ch.zishan.service.RecordService;
-import com.ch.zishan.utils.TimeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,17 +46,7 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
     public void editCard(Card card) {
         cardMapper.updateById(card);
         // 修改今日学习表记录
-        Record record = recordService.getTodayRecordByUserId(BaseContext.get());
-        if (record == null) {
-            record = new Record();
-            record.setUserId(BaseContext.get());
-            record.setEditNum(1);
-            record.setTime(TimeUtils.getCurrentDateStamp());
-            recordService.save(record);
-        } else {
-            record.setEditNum(record.getEditNum() + 1);
-            recordService.updateById(record);
-        }
+        recordService.editNumAddOne(BaseContext.get());
     }
 
 
@@ -89,18 +78,7 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
         });
 
         // 修改今日学习表记录
-        Record record = recordService.getTodayRecordByUserId(BaseContext.get());
-        if (record == null) {
-            record = new Record();
-            record.setUserId(BaseContext.get());
-            record.setAddNum(1);
-            record.setTime(TimeUtils.getCurrentDateStamp());
-            recordService.save(record);
-        } else {
-            record.setAddNum(record.getAddNum() + 1);
-            recordService.updateById(record);
-        }
-
+        recordService.addNumAddOne(BaseContext.get());
         return true;
     }
 

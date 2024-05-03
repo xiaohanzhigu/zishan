@@ -34,12 +34,7 @@ public class TimeUtils {
      * @return
      */
     public static long getTodayEndStamp(){
-        try {
             return getDateByDays(getCurrentDateStamp(), 1);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -66,9 +61,8 @@ public class TimeUtils {
      * @param time
      * @param intervalDay
      * @return
-     * @throws ParseException
      */
-    public static long getDateByDays(long time, int intervalDay) throws ParseException {
+    public static long getDateByDays(long time, int intervalDay)  {
         // 转换成Calendar
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
