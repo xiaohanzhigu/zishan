@@ -12,4 +12,6 @@ public interface CardService extends IService<Card> {
     public Integer deleteOrRecoverCardLogic(Long cardId, Integer isDeleted);
 
     public Integer deleteCard(Long cardId);
+
+    public void editCard(Card card);
 }

@@ -67,7 +67,8 @@ public class CardController {
         if (!SysUtils.checkUser(BaseContext.get(), oldCard.getCreateUser())) {
             return Result.error( "无权限编辑");
         }
-        cardService.updateById(card);
+//        cardService.updateById(card);
+        cardService.editCard(card);
         return Result.success("编辑成功");
     }
 

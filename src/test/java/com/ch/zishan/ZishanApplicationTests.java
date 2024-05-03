@@ -1,14 +1,17 @@
 package com.ch.zishan;
 
-import org.apache.commons.lang.RandomStringUtils;
+import com.ch.zishan.utils.TimeUtils;
 import org.junit.jupiter.api.Test;
+
+import java.text.ParseException;
 
 
 class ZishanApplicationTests {
 
     @Test
-    void contextLoads() {
-        System.out.println(RandomStringUtils.randomAlphanumeric(10) );
+    void contextLoads() throws ParseException {
+        System.out.println(TimeUtils.getCurrentDateStamp());
+        System.out.println(TimeUtils.getTomorrowDateStamp());
     }
 
 }

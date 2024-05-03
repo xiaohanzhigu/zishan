@@ -26,10 +26,6 @@ public class ChapterServiceImpl extends ServiceImpl<ChapterMapper, Chapter> impl
     private CardService cardService;
     @Resource
     private CardGroupMapper cardGroupMapper;
-    @Resource
-    private LearnedCardMapper learnedCardMapper;
-    @Resource
-    private LearnedCardGroupMapper learnedCardGroupMapper;
 
     @Override
     public boolean addChapter(Chapter chapter) {

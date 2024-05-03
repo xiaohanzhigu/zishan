@@ -3,9 +3,12 @@ package com.ch.zishan.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ch.zishan.common.BaseContext;
 import com.ch.zishan.mapper.*;
 import com.ch.zishan.pojo.*;
 import com.ch.zishan.service.CardService;
+import com.ch.zishan.service.RecordService;
+import com.ch.zishan.utils.TimeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,8 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
     private LearnedCardMapper learnedCardMapper;
     @Resource
     private LearnedCardGroupMapper learnedCardGroupMapper;
+    @Resource
+    private RecordService recordService;
 
     @Override
     public Integer deleteCard(Long cardId) {
@@ -36,6 +41,23 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
             learnedCardGroupMapper.updateById(learnedCardGroup);
         });
         return cardMapper.deleteById(cardId);
+    }
+
+    @Override
+    public void editCard(Card card) {
+        cardMapper.updateById(card);
+        // 修改今日学习表记录
+        Record record = recordService.getTodayRecordByUserId(BaseContext.get());
+        if (record == null) {
+            record = new Record();
+            record.setUserId(BaseContext.get());
+            record.setEditNum(1);
+            record.setTime(TimeUtils.getCurrentDateStamp());
+            recordService.save(record);
+        } else {
+            record.setEditNum(record.getEditNum() + 1);
+            recordService.updateById(record);
+        }
     }
 
 
@@ -66,6 +88,18 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements Ca
             learnedCardGroupMapper.updateById(learnedCardGroup);
         });
 
+        // 修改今日学习表记录
+        Record record = recordService.getTodayRecordByUserId(BaseContext.get());
+        if (record == null) {
+            record = new Record();
+            record.setUserId(BaseContext.get());
+            record.setAddNum(1);
+            record.setTime(TimeUtils.getCurrentDateStamp());
+            recordService.save(record);
+        } else {
+            record.setAddNum(record.getAddNum() + 1);
+            recordService.updateById(record);
+        }
 
         return true;
     }

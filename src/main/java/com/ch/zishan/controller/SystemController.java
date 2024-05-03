@@ -65,8 +65,8 @@ public class SystemController {
         if (group.getIsDeleted() == 1) {
             return Result.error("404","卡片集不存在");
         }
+        shareService.remove(new QueryWrapper<Share>().eq("card_group_id", share.getCardGroupId()));
         share.setUserId(BaseContext.get());
-//        share.setCardGroupId(cardGroupId);
         share.setShareCode(RandomStringUtils.randomAlphanumeric(10));
         shareService.save(share);
         return Result.success(share.getShareCode());

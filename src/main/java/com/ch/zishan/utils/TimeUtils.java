@@ -21,7 +21,31 @@ public class TimeUtils {
 
     /*----日期类----*/
 
-    // 得到当前日期戳(不带时间，只有日期)
+    /**
+     * 今日开始的日期戳
+     * @return
+     */
+    public static long getTodayStartStamp() {
+        return getCurrentDateStamp();
+    }
+
+    /**
+     * 今日结束的日期戳
+     * @return
+     */
+    public static long getTodayEndStamp(){
+        try {
+            return getDateByDays(getCurrentDateStamp(), 1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 得到当前日期的时间戳（不带时间，只有日期）
+     * @return
+     */
     public static long getCurrentDateStamp() {
         Calendar cal = Calendar.getInstance();
         int currentYear = cal.get(Calendar.YEAR);
@@ -37,6 +61,22 @@ public class TimeUtils {
         return time;
     }
 
+    /**
+     * 得到间隔天数的时间戳
+     * @param time
+     * @param intervalDay
+     * @return
+     * @throws ParseException
+     */
+    public static long getDateByDays(long time, int intervalDay) throws ParseException {
+        // 转换成Calendar
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.add(Calendar.DATE, intervalDay);
+        return calendar.getTimeInMillis();
+    }
+
+
     // 根据指定日期戳解析成日期形式（yyyy-MM-dd）
     public static String getStringDate(long timeStamp) {
         return simpleDateFormat.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
@@ -48,14 +88,6 @@ public class TimeUtils {
         return simpleDateFormat.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
     }
 
-    // 得到当前日期的指定间隔后的日期
-    public static long getDateByDays(long time, int intervalDay) throws ParseException {
-        // 转换成Calendar
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(time);
-        calendar.add(Calendar.DATE, intervalDay);
-        return calendar.getTimeInMillis();
-    }
 
     // 返回两个日期之间相隔多少天
     public static int daysInternal(long time1, long time2) throws ParseException {
