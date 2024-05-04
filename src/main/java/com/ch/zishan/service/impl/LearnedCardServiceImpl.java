@@ -62,6 +62,24 @@ public class LearnedCardServiceImpl extends ServiceImpl<LearnedCardMapper, Learn
     }
 
     @Override
+    public List<Card> getReviewCardList(LearnedCardGroup learnedCardGroup) {
+        QueryWrapper<LearnedCard> learnedCardQueryWrapper = new QueryWrapper<>();
+        List<Card> cardList = new ArrayList<>();
+        learnedCardQueryWrapper.eq("learned_card_group_id",learnedCardGroup.getId())
+                .le("need_review_date", TimeUtils.getTodayEndStamp())
+                .eq("is_deleted", 0)
+                .orderByAsc("need_review_date")
+                .ge("master_degree", 1)
+                .ne("deep_master_times", 3); // 深度掌握次数大于3时不再复习
+        learnedCardMapper.selectList(learnedCardQueryWrapper).forEach(learnedCard -> {
+            Card card = cardMapper.selectById(learnedCard.getCardId());
+            cardList.add(card);
+        });
+
+        return cardList;
+    }
+
+    @Override
     public Integer deleteOrRecoverLearnedCardLogic(Long cardId, Integer isDeleted) {
         UpdateWrapper<LearnedCard> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("card_id", cardId).set("is_deleted", isDeleted);

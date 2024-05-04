@@ -113,4 +113,23 @@ public class LearnedCardGroupController {
         }
         return Result.success(cardList);
     }
+
+    @GetMapping("/reviewCardList")
+    public Result<List<Card>> getReviewList(@RequestParam Long cardGroupId) {
+        log.info("获取今日复习卡片列表");
+        QueryWrapper<LearnedCardGroup> wrapper = new QueryWrapper<>();
+        wrapper.eq("card_group_id", cardGroupId)
+                .eq("user_id", BaseContext.get())
+                .eq("is_deleted", 0);
+
+        LearnedCardGroup learnedGroup = learnedCardGroupService.getOne(wrapper);
+        if (learnedGroup == null) {
+            return Result.error("卡片集不存在");
+        }
+        List<Card> cardList = learnedCardService.getReviewCardList(learnedGroup);
+        if (cardList == null || cardList.isEmpty()) {
+            return Result.success("201", "该卡片集已经复习完毕了");
+        }
+        return Result.success(cardList);
+    }
 }

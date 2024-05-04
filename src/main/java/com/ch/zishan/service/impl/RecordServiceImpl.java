@@ -28,6 +28,9 @@ public class RecordServiceImpl extends ServiceImpl<RecordMapper, Record> impleme
             record = new Record();
             record.setUserId(userId);
             record.setTime(TimeUtils.getCurrentDateStamp());
+            record.setAddNum(0);
+            record.setEditNum(0);
+            record.setLearnedNum(0);
             recordMapper.insert(record);
         }
         return record;
@@ -42,8 +45,8 @@ public class RecordServiceImpl extends ServiceImpl<RecordMapper, Record> impleme
     @Override
     public void dayPlanNumAddOne(Long userId) {
         Record record = getTodayRecordByUserId(userId);
-            record.setLearnedNum(record.getLearnedNum() + 1);
-            recordMapper.updateById(record);
+        record.setLearnedNum(record.getLearnedNum() + 1);
+        recordMapper.updateById(record);
     }
 
     @Override

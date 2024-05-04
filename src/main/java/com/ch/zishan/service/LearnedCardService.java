@@ -10,6 +10,8 @@ import java.util.List;
 public interface LearnedCardService extends IService<LearnedCard> {
     public List<Card> getLearnedCardList(LearnedCardGroup learnedCardGroup);
 
+    public List<Card> getReviewCardList(LearnedCardGroup learnedCardGroup);
+
     public Integer deleteOrRecoverLearnedCardLogic(Long cardId, Integer isDeleted);
 
     public void finishLearnOrReview(Long cardGroupId, Long cardId, String firstClick);
