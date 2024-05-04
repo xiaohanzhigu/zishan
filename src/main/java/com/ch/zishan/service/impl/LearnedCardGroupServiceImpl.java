@@ -3,9 +3,11 @@ package com.ch.zishan.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ch.zishan.dto.CardGroupDto;
 import com.ch.zishan.mapper.*;
 import com.ch.zishan.pojo.*;
 import com.ch.zishan.service.LearnedCardGroupService;
+import com.ch.zishan.utils.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,5 +79,38 @@ public class LearnedCardGroupServiceImpl extends ServiceImpl<LearnedCardGroupMap
         }
         learnedCardMapper.delete(new QueryWrapper<LearnedCard>().eq("learned_card_group_id", learnedCardGroup.getId()));
         learnedCardGroupMapper.delete(wrapper);
+    }
+
+    @Override
+    public CardGroupDto getReviewNumAndNotLearnedNum(Long userId, Long cardGroupId) {
+        // 获取学习卡片集
+        QueryWrapper<LearnedCardGroup> learnedCardGroupQueryWrapper = new QueryWrapper<LearnedCardGroup>()
+                .eq("user_id", userId)
+                .eq("card_group_id", cardGroupId)
+                .eq("is_deleted", 0);
+        LearnedCardGroup learnedCardGroup = learnedCardGroupMapper.selectOne(learnedCardGroupQueryWrapper);
+        if (learnedCardGroup == null) {
+            return null;
+        }
+        // 需要学习的卡片
+        List<LearnedCard> learnedCardList = learnedCardMapper.selectList(new QueryWrapper<LearnedCard>()
+                .eq("learned_card_group_id", learnedCardGroup.getId()));
+        int needLearnedNum = (int) learnedCardList.stream().filter(card -> card.getMasterDegree() == 0).count();
+        // 需要复习的卡片
+        QueryWrapper<LearnedCard> learnedCardQueryWrapper = new QueryWrapper<>();
+        learnedCardQueryWrapper.eq("learned_card_group_id",learnedCardGroup.getId())
+                .le("need_review_date", TimeUtils.getTodayEndStamp())
+                .eq("is_deleted", 0)
+                .orderByAsc("need_review_date")
+                .ge("master_degree", 1)
+                .ne("deep_master_times", 3); // 深度掌握次数大于3时不再复习
+        List<LearnedCard> reviewCardList = learnedCardMapper.selectList(learnedCardQueryWrapper);
+        int needReviewNum = reviewCardList.size();
+
+        CardGroupDto cardGroupDto = new CardGroupDto();
+        cardGroupDto.setNeedReviewNum(needReviewNum);
+        cardGroupDto.setNeedLearnNum(needLearnedNum);
+
+        return cardGroupDto;
     }
 }

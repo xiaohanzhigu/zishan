@@ -1,25 +1,22 @@
 package com.ch.zishan.controller;
 
-import com.auth0.jwt.JWT;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.ch.zishan.common.BaseContext;
 import com.ch.zishan.common.Result;
+import com.ch.zishan.dto.CardGroupDto;
 import com.ch.zishan.pojo.Card;
 import com.ch.zishan.pojo.CardGroup;
 import com.ch.zishan.pojo.Chapter;
 import com.ch.zishan.pojo.Collect;
-import com.ch.zishan.service.CardGroupService;
-import com.ch.zishan.service.CardService;
-import com.ch.zishan.service.ChapterService;
-import com.ch.zishan.service.CollectService;
+import com.ch.zishan.service.*;
 import com.ch.zishan.utils.SysUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +34,8 @@ public class CardGroupController {
     private ChapterService chapterService;
     @Resource
     private CollectService collectService;
+    @Resource
+    private LearnedCardGroupService learnedCardGroupService;
 
     @PutMapping("/open")
     public Result<String> isPublic(@RequestBody CardGroup cardGroup) {
@@ -145,7 +144,7 @@ public class CardGroupController {
         return Result.success("更新成功");
     }
 
-    @PostMapping("/addCardGroup")
+    @PostMapping
     public Result<Long> addCardGroup() {
         log.info("添加卡片集");
         CardGroup cardGroup = new CardGroup();
@@ -156,8 +155,8 @@ public class CardGroupController {
         return Result.success(cardGroup.getId());
     }
 
-    @GetMapping("/detail")
-    public Result<CardGroup> detail(@RequestParam Long id) {
+    @GetMapping("/{id}")
+    public Result<CardGroupDto> detailDto(@PathVariable Long id) {
         QueryWrapper<CardGroup> groupWrapper = new QueryWrapper<>();
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
         QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
@@ -194,20 +193,22 @@ public class CardGroupController {
             msg = "1"; // 不是创建者
         }
 
-        return Result.success(group,msg);
+        CardGroupDto groupDto = learnedCardGroupService.getReviewNumAndNotLearnedNum(BaseContext.get(), group.getId());
+        if (groupDto != null) {
+            BeanUtils.copyProperties(group, groupDto);
+        }
+
+        return Result.success(groupDto,msg);
     }
 
-    @GetMapping("/allCardGroup")
-    public Result<List<CardGroup>> allCardGroup(HttpServletRequest request, @RequestParam String type) {
-        String token = request.getHeader("Token");
-        String msg = "0";
-        Long id = Long.valueOf(JWT.decode(token).getAudience().get(0));
-        log.info("查询卡片集用户：" + id);
+
+    @GetMapping("/all/{type}")
+    public Result<List<CardGroupDto>> allCardGroupDto(@PathVariable String type) {
+        long id = BaseContext.get();
         log.info("查询卡片集类型：" + type);
 
         QueryWrapper<CardGroup> cardGroupWrapper = new QueryWrapper<>();
         QueryWrapper<Chapter> chapterWrapper = new QueryWrapper<>();
-        QueryWrapper<Card> cardWrapper = new QueryWrapper<>();
         if ("我的卡片集".equals(type)) {
             cardGroupWrapper.eq("user", id)
                     .eq("is_deleted", 0);
@@ -215,7 +216,6 @@ public class CardGroupController {
             cardGroupWrapper.eq("user", id)
                     .eq("is_deleted", 1);
         } else if("我的收藏".equals(type)) {
-            msg = "1";
             QueryWrapper<Collect> collectQueryWrapper = new QueryWrapper<Collect>()
                     .eq("user_id", BaseContext.get())
                     .eq("is_deleted", 0);
@@ -230,20 +230,21 @@ public class CardGroupController {
                 return Result.success(new ArrayList<>());
             }
 
-
         } else {
             return Result.error("类型错误");
         }
 
+        List<CardGroupDto> dtoList = new ArrayList<>();
         List<CardGroup> list = cardGroupService.list(cardGroupWrapper);
+        list.forEach(cardGroup -> {
+            CardGroupDto reviewNumAndNotLearnedNum = learnedCardGroupService.getReviewNumAndNotLearnedNum(id, cardGroup.getId());
+            if (reviewNumAndNotLearnedNum != null) {
+                BeanUtils.copyProperties(cardGroup, reviewNumAndNotLearnedNum);
+            }
+            dtoList.add(reviewNumAndNotLearnedNum);
+        });
 
-        for (CardGroup group : list) {
-            chapterWrapper.clear();
-            chapterWrapper.eq("card_group",group.getId());
-            List<Chapter> chapterList =  chapterService.list(chapterWrapper);
-            group.setChapterList(chapterList);
-        }
-
-        return Result.success(list,msg);
+        return Result.success(dtoList);
     }
+
 }

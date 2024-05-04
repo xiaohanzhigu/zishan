@@ -95,7 +95,7 @@ public class LearnedCardGroupController {
         return Result.success("学习完成");
     }
 
-    @GetMapping("/learningCardList")
+    @GetMapping("/learning")
     public Result<List<Card>> getTodayLearningCardList(@RequestParam Long cardGroupId) {
         log.info("获取今日学习卡片列表");
         QueryWrapper<LearnedCardGroup> wrapper = new QueryWrapper<>();
@@ -114,7 +114,7 @@ public class LearnedCardGroupController {
         return Result.success(cardList);
     }
 
-    @GetMapping("/reviewCardList")
+    @GetMapping("/review")
     public Result<List<Card>> getReviewList(@RequestParam Long cardGroupId) {
         log.info("获取今日复习卡片列表");
         QueryWrapper<LearnedCardGroup> wrapper = new QueryWrapper<>();
