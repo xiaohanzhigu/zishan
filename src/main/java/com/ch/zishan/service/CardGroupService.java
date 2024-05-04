@@ -3,6 +3,8 @@ package com.ch.zishan.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ch.zishan.pojo.CardGroup;
 
+import java.util.List;
+
 public interface CardGroupService extends IService<CardGroup> {
 
     public Integer addCardGroup(CardGroup cardGroup);
@@ -16,5 +18,7 @@ public interface CardGroupService extends IService<CardGroup> {
     public void allDeleteCardGroup(Long id);
 
     public CardGroup getCardGroupById(Long id);
+
+    public List<CardGroup> getCardGroupListByUserId(Long userId);
 
 }

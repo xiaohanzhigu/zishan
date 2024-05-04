@@ -11,7 +11,8 @@ class ZishanApplicationTests {
     @Test
     void contextLoads() throws ParseException {
         System.out.println(TimeUtils.getCurrentTimeStamp());
-        System.out.println(TimeUtils.getDateByDays(TimeUtils.getCurrentTimeStamp(),7));
+        System.out.println(TimeUtils.getDateByDays(TimeUtils.getCurrentTimeStamp(),-1));;
+        System.out.println(TimeUtils.getStringDateMMDD(TimeUtils.getCurrentTimeStamp()));
     }
 
 }

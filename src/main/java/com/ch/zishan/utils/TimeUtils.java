@@ -76,6 +76,12 @@ public class TimeUtils {
         return simpleDateFormat.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
     }
 
+    // 根据指定日期戳解析成日期形式（MM-dd）
+    public static String getStringDateMMDD(long timeStamp) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd");
+        return simpleDateFormat.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
+    }
+
     // 根据指定日期戳解析成日期形式（yyyy-MM-dd）
     public static String getStringDateDetail(long timeStamp) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -144,4 +144,19 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         return cardGroup;
     }
 
+    @Override
+    public List<CardGroup> getCardGroupListByUserId(Long userId) {
+        List<CardGroup> cardGroupList = cardGroupMapper.selectList(new QueryWrapper<CardGroup>().eq("user", userId));
+        cardGroupList.forEach(cardGroup -> {
+            List<Chapter> chapterList = new ArrayList<>();
+            chapterService.list(new QueryWrapper<Chapter>().eq("card_group",cardGroup.getId())).forEach(chapter -> {
+                List<Card> cards = cardService.list(new QueryWrapper<Card>().eq("chapter", chapter.getId()));
+                chapter.setCardList(cards);
+                chapterList.add(chapter);
+            });
+            cardGroup.setChapterList(chapterList);
+        });
+        return cardGroupList;
+    }
+
 }
