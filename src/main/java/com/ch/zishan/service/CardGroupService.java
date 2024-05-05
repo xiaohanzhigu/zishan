@@ -21,4 +21,6 @@ public interface CardGroupService extends IService<CardGroup> {
 
     public List<CardGroup> getCardGroupListByUserId(Long userId);
 
+    public List<CardGroup> search(String key);
+
 }

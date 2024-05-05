@@ -12,6 +12,7 @@ import com.ch.zishan.pojo.Collect;
 import com.ch.zishan.service.*;
 import com.ch.zishan.utils.SysUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,33 @@ public class CardGroupController {
     private CollectService collectService;
     @Resource
     private LearnedCardGroupService learnedCardGroupService;
+
+    @GetMapping("/collect/{id}")
+    public Result<CardGroup> getCardGroupById(@PathVariable Long id) {
+        log.info("查询卡片集，id：" + id);
+        if (id == null) {
+            return Result.error("id不能为空");
+        }
+        CardGroup group = cardGroupService.getCardGroupById(id);
+        if (group == null) {
+            return Result.error("卡片集不存在");
+        }
+        if (group.getIsDeleted() == 1 || group.getIsPublic() == 0) {
+            return Result.error("卡片集不存在");
+        }
+
+        return Result.success(group);
+    }
+
+    @GetMapping("/search/{key}")
+    public Result<List<CardGroup>> search(@PathVariable String key) {
+        log.info("搜索卡片集，关键字：" + key);
+        if (StringUtils.isBlank(key)) {
+            return Result.error("关键字不能为空");
+        }
+        List<CardGroup> list = cardGroupService.search(key);
+        return Result.success(list);
+    }
 
     @PutMapping("/open")
     public Result<String> isPublic(@RequestBody CardGroup cardGroup) {
@@ -233,7 +261,7 @@ public class CardGroupController {
         } else {
             return Result.error("类型错误");
         }
-
+        cardGroupWrapper.orderByDesc("update_time");
         List<CardGroupDto> dtoList = new ArrayList<>();
         List<CardGroup> list = cardGroupService.list(cardGroupWrapper);
         list.forEach(cardGroup -> {

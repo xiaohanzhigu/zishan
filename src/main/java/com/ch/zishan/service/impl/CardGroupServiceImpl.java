@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,15 +41,15 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         // 恢复卡片集中的所有章节
         chapterService.deleteOrRecoverChapterLogic(cardGroupId, 0);
         // 恢复每个章节中的卡片和对应的学习卡片
-        chapterWrapper.eq("card_group",cardGroupId);
+        chapterWrapper.eq("card_group", cardGroupId);
         chapterService.list(chapterWrapper).forEach(chapter -> {
             cardQueryWrapper.clear();
-            cardQueryWrapper.eq("chapter",chapter.getId());
+            cardQueryWrapper.eq("chapter", chapter.getId());
             cardService.list(cardQueryWrapper).forEach(card -> {
-                cardService.deleteOrRecoverCardLogic(card.getId(),0);
-                learnedCardService.deleteOrRecoverLearnedCardLogic(card.getId(),0);
+                cardService.deleteOrRecoverCardLogic(card.getId(), 0);
+                learnedCardService.deleteOrRecoverLearnedCardLogic(card.getId(), 0);
             });
-       });
+        });
         return 1;
     }
 
@@ -135,7 +138,7 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
     public CardGroup getCardGroupById(Long id) {
         CardGroup cardGroup = cardGroupMapper.selectById(id);
         List<Chapter> chapterList = new ArrayList<>();
-        chapterService.list(new QueryWrapper<Chapter>().eq("card_group",id)).forEach(chapter -> {
+        chapterService.list(new QueryWrapper<Chapter>().eq("card_group", id)).forEach(chapter -> {
             List<Card> cards = cardService.list(new QueryWrapper<Card>().eq("chapter", chapter.getId()));
             chapter.setCardList(cards);
             chapterList.add(chapter);
@@ -149,7 +152,7 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
         List<CardGroup> cardGroupList = cardGroupMapper.selectList(new QueryWrapper<CardGroup>().eq("user", userId));
         cardGroupList.forEach(cardGroup -> {
             List<Chapter> chapterList = new ArrayList<>();
-            chapterService.list(new QueryWrapper<Chapter>().eq("card_group",cardGroup.getId())).forEach(chapter -> {
+            chapterService.list(new QueryWrapper<Chapter>().eq("card_group", cardGroup.getId())).forEach(chapter -> {
                 List<Card> cards = cardService.list(new QueryWrapper<Card>().eq("chapter", chapter.getId()));
                 chapter.setCardList(cards);
                 chapterList.add(chapter);
@@ -157,6 +160,57 @@ public class CardGroupServiceImpl extends ServiceImpl<CardGroupMapper, CardGroup
             cardGroup.setChapterList(chapterList);
         });
         return cardGroupList;
+    }
+
+    @Override
+    public List<CardGroup> search(String key) {
+        // 先查询卡片集
+        QueryWrapper<CardGroup> groupQueryWrapper = new QueryWrapper<CardGroup>()
+                .like("name", key)
+                .eq("is_deleted", 0)
+                .eq("is_public", 1);
+        List<CardGroup> cardGroups = cardGroupMapper.selectList(groupQueryWrapper);
+        List<CardGroup> list = new ArrayList<>(cardGroups);
+
+        // 查询公开的卡片集
+        groupQueryWrapper.clear();
+        groupQueryWrapper.eq("is_deleted", 0)
+                .eq("is_public", 1);
+        List<CardGroup> cardGroupList = cardGroupMapper.selectList(groupQueryWrapper);
+
+        // 查询章节
+        List<CardGroup> finalList = list;
+        cardGroupList.forEach(cardGroup -> {
+            QueryWrapper<Chapter> chapterQueryWrapper = new QueryWrapper<Chapter>()
+                    .eq("card_group", cardGroup.getId())
+                    .like("name", key);
+            List<Chapter> chapters = chapterService.list(chapterQueryWrapper);
+            if (!chapters.isEmpty()) {
+                finalList.add(cardGroup);
+            }
+        });
+        // 查询卡片
+        List<CardGroup> finalList1 = list;
+        cardGroupList.forEach(cardGroup -> {
+            QueryWrapper<Chapter> chapterQueryWrapper = new QueryWrapper<Chapter>()
+                    .eq("card_group", cardGroup.getId());
+            List<Chapter> chapters = chapterService.list(chapterQueryWrapper);
+            chapters.forEach(chapter -> {
+                QueryWrapper<Card> cardQueryWrapper = new QueryWrapper<Card>()
+                        .eq("chapter", chapter.getId())
+                        .like("content", key);
+                List<Card> cards = cardService.list(cardQueryWrapper);
+                if (!cards.isEmpty()) {
+                    finalList1.add(cardGroup);
+                }
+            });
+        });
+        // 根据id去重
+        list = list.stream().collect(
+                Collectors.collectingAndThen(
+                        Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(CardGroup::getId))), ArrayList::new)
+        );
+        return list;
     }
 
 }
